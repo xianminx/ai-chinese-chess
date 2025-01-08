@@ -1,25 +1,15 @@
 import { Piece } from "../types/GameTypes";
-import { useEffect, useRef } from "react";
 
 interface CellProps {
-    piece: Piece;
+    piece: Piece | undefined;
     isSelected: boolean;
     onClick: () => void;
     style?: React.CSSProperties;
 }
 
 export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
-    useEffect(() => {
-        audioRef.current = new Audio("/audio/click.wav");
-    }, []);
 
     const handleClick = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play();
-        }
         onClick();
     };
 
@@ -35,23 +25,25 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
         flex items-center justify-center
         cursor-pointer 
         transition-all duration-200
-        bg-gray-100
+        ${piece ? "bg-gray-100" : "bg-transparent"}
         ${isSelected ? "ring-[15%] ring-yellow-400 bg-yellow-200" : ""}
         hover:brightness-95
       `}
             style={style}
             onClick={handleClick}
         >
-            <span
-                className={`
+            {piece && (
+                <span
+                    className={`
           w-full h-full flex items-center justify-center
           text-[60%] leading-none
           ${piece.color === "red" ? "text-red-600" : "text-black"}
         `}
-                style={{ fontSize: fontSize }}
-            >
-                {piece.type}
-            </span>
+                    style={{ fontSize: fontSize }}
+                >
+                    {piece.type}
+                </span>
+            )}
         </div>
     );
 }
