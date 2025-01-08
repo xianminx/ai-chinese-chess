@@ -10,7 +10,6 @@ interface ChessboardProps {
     onPieceMove: (from: Position, to: Position) => void;
 }
 
-
 export default function Chessboard({
     gameState,
     onPieceSelect,
@@ -19,13 +18,28 @@ export default function Chessboard({
     const { pieces, selectedPiece } = gameState;
     const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
     const [cellSize, setCellSize] = useState(0);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
+    const clickAudioRef = useRef<HTMLAudioElement | null>(null);
+    const selectAudioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        audioRef.current = new Audio("/audio/click.wav");
+        // Initialize audio instances
+        clickAudioRef.current = new Audio("/audio/click.wav");
+        selectAudioRef.current = new Audio("/audio/select.wav");
     }, []);
 
+    const playMoveSound = () => {
+        if (clickAudioRef.current) {
+            clickAudioRef.current.currentTime = 0;
+            clickAudioRef.current.play();
+        }
+    };
+
+    const playSelectSound = () => {
+        if (selectAudioRef.current) {
+            selectAudioRef.current.currentTime = 0;
+            selectAudioRef.current.play();
+        }
+    };
     useEffect(() => {
         const updateBoardSize = () => {
             const vw = Math.min(window.innerWidth, 800);
@@ -40,31 +54,13 @@ export default function Chessboard({
         return () => window.removeEventListener("resize", updateBoardSize);
     }, []);
 
-
-    const playMoveSounce = () => {   
-        if (audioRef.current) {
-       audioRef.current.currentTime = 0;
-       audioRef.current.src = "/audio/move.wav";
-       audioRef.current.play();
-   }
-   }
-
-   const playSelectSounce = () => {
-       if (audioRef.current) {
-           audioRef.current.currentTime = 0;
-           audioRef.current.src = "/audio/select.wav";
-           audioRef.current.play();
-       }
-   }
-   
     const selectPiece = (piece: Piece | null) => {
-        playSelectSounce();
+        playSelectSound();
         onPieceSelect(piece);
     };
 
-
     const movePiece = (from: Position, to: Position) => {
-        playMoveSounce();
+        playMoveSound();
         onPieceMove(from, to);
     };
 
@@ -108,27 +104,26 @@ export default function Chessboard({
         const piece = pieces.find(
             (p) => p.position.x === position.x && p.position.y === position.y
         );
-            const { left, top } = getPixelPosition(position);
-            return (
-                <Cell
-                    key={`${position.x}-${position.y}`}
-                    piece={piece}
-                    style={{
-                        position: "absolute",
-                        left: left,
-                        top: top,
-                        width: `${cellSize}px`,
-                        height: `${cellSize}px`,
-                    }}
-                    isSelected={Boolean(
-                        selectedPiece &&
-                            selectedPiece.position.x === position.x &&
-                            selectedPiece.position.y === position.y
-                    )}
-                    onClick={() => handleCellClick(position)}
-                />
-            );
-     
+        const { left, top } = getPixelPosition(position);
+        return (
+            <Cell
+                key={`${position.x}-${position.y}`}
+                piece={piece}
+                style={{
+                    position: "absolute",
+                    left: left,
+                    top: top,
+                    width: `${cellSize}px`,
+                    height: `${cellSize}px`,
+                }}
+                isSelected={Boolean(
+                    selectedPiece &&
+                        selectedPiece.position.x === position.x &&
+                        selectedPiece.position.y === position.y
+                )}
+                onClick={() => handleCellClick(position)}
+            />
+        );
     };
 
     return (

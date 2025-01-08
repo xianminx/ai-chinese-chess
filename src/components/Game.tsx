@@ -7,7 +7,7 @@ export default function Game() {
     const { gameState, selectPiece, movePiece, resetGame } = useGameState();
 
     return (
-        <div className="w-full flex items-center justify-center bg-gray-100 p-4">
+        <div className="w-full flex items-center justify-center">
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
                 {/* Game Info Header */}
                 <div className="w-full text-center mb-2">
