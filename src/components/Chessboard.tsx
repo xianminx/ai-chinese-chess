@@ -2,6 +2,7 @@
 import { Piece, Position, GameState } from "../types/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
+import { useEffect, useState } from "react";
 
 interface ChessboardProps {
     gameState: GameState;
@@ -9,15 +10,26 @@ interface ChessboardProps {
     onPieceMove: (from: Position, to: Position) => void;
 }
 
-const BOARD_WIDTH = 500;
-const BOARD_HEIGHT = 550;
-
 export default function Chessboard({
     gameState,
     onPieceSelect,
     onPieceMove,
 }: ChessboardProps) {
     const { pieces, selectedPiece } = gameState;
+    const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const updateBoardSize = () => {
+            const vw = Math.min(window.innerWidth, 800);
+            const width = Math.min(vw * 0.9, 500);
+            const height = width * 1.1;
+            setBoardSize({ width, height });
+        };
+
+        updateBoardSize();
+        window.addEventListener('resize', updateBoardSize);
+        return () => window.removeEventListener('resize', updateBoardSize);
+    }, []);
 
     const handleCellClick = (position: Position) => {
         const pieceAtPosition = pieces.find(
@@ -50,38 +62,46 @@ export default function Chessboard({
 
     const getPixelPosition = (position: Position) => {
         return {
-            left: `${((position.x + 1) / 10) * BOARD_WIDTH}px`,
-            top: `${((position.y + 1) / 11) * BOARD_HEIGHT}px`,
+            left: `${((position.x + 1) / 10) * boardSize.width}px`,
+            top: `${((position.y + 1) / 11) * boardSize.height}px`,
         };
     };
 
+
     return (
-        <div
-            className={`max-w-[800px] mx-auto absolute inset-0  bg-no-repeat bg-contain bg-center w-[${BOARD_WIDTH}px] h-[${BOARD_HEIGHT}px]`}
-            style={{
-                backgroundImage: `url(${BoardGrid.src})`,
-            }}
-        >
-            {pieces.map((piece) => {
-                const { left, top } = getPixelPosition(piece.position);
-                return (
-                    <Cell
-                        key={`${piece.type}-${piece.color}-${piece.position.x}-${piece.position.y}`}
-                        piece={piece}
-                        style={{
-                            position: "absolute",
-                            left: left,
-                            top: top,
-                        }}
-                        isSelected={Boolean(
-                            selectedPiece &&
-                                selectedPiece.position.x === piece.position.x &&
-                                selectedPiece.position.y === piece.position.y
-                        )}
-                        onClick={() => handleCellClick(piece.position)}
-                    />
-                );
-            })}
+        <div className="w-full flex justify-center items-center">
+            <div
+                className="relative bg-no-repeat bg-contain bg-center"
+                style={{
+                    backgroundImage: `url(${BoardGrid.src})`,
+                    width: `${boardSize.width}px`,
+                    height: `${boardSize.height}px`,
+                }}
+            >
+                {pieces.map((piece) => {
+                    const { left, top } = getPixelPosition(piece.position);
+                    const cellSize = boardSize.width / 14;          
+                    return (
+                        <Cell
+                            key={`${piece.type}-${piece.color}-${piece.position.x}-${piece.position.y}`}
+                            piece={piece}
+                            style={{
+                                position: "absolute",
+                                left: left,
+                                top: top,
+                                width: `${cellSize}px`,
+                                height: `${cellSize}px`,
+                            }}
+                            isSelected={Boolean(
+                                selectedPiece &&
+                                    selectedPiece.position.x === piece.position.x &&
+                                    selectedPiece.position.y === piece.position.y
+                            )}
+                            onClick={() => handleCellClick(piece.position)}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 }

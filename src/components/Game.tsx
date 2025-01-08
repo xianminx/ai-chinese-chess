@@ -7,7 +7,7 @@ export default function Game() {
     const { gameState, selectPiece, movePiece, resetGame } = useGameState();
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
+        <div className="w-full flex items-center justify-center bg-gray-100 p-4">
             <div className="w-full max-w-2xl flex flex-col items-center gap-4">
                 <div className="w-full aspect-square">
                     <Chessboard
