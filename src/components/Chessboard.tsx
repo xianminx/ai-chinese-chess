@@ -3,6 +3,7 @@ import { Piece, Position, GameState } from "../types/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
 import { useEffect, useRef, useState } from "react";
+import { isValidMove } from "../utils/moveValidation";
 
 interface ChessboardProps {
     gameState: GameState;
@@ -70,7 +71,7 @@ export default function Chessboard({
         );
 
         if (selectedPiece) {
-            if (isValidMove(selectedPiece.position, position)) {
+            if (isValidMove(gameState, selectedPiece.position, position)) {
                 movePiece(selectedPiece.position, position);
                 selectPiece(null);
             } else if (pieceAtPosition) {
@@ -79,18 +80,6 @@ export default function Chessboard({
         } else if (pieceAtPosition) {
             selectPiece(pieceAtPosition);
         }
-    };
-
-    const isValidMove = (from: Position, to: Position): boolean => {
-        if (to.x < 0 || to.x > 8 || to.y < 0 || to.y > 9) return false;
-
-        const destinationPiece = pieces.find(
-            (p) => p.position.x === to.x && p.position.y === to.y
-        );
-        if (destinationPiece && destinationPiece.color === selectedPiece?.color)
-            return false;
-
-        return true;
     };
 
     const getPixelPosition = (position: Position) => {

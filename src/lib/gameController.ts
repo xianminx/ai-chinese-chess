@@ -1,45 +1,33 @@
-import type { GameState, ChessPiece, PieceColor } from './types';
+import type { PlayerColor, GameStatus, GameState } from '../types/GameTypes';
 
 export class GameController {
-  private board: Record<string, ChessPiece>;
-  private currentTurn: PieceColor;
-  private gameStatus: GameState['game_status'];
+  private gameState: GameState;
+  private currentTurn: PlayerColor;
+  private gameStatus: GameStatus;
 
   constructor() {
     // Initialize your game state here
-    this.board = this.initializeBoard();
-    this.currentTurn = 'white';
+    this.gameState = this.initializeBoard();
+    this.currentTurn = 'red';
     this.gameStatus = 'active';
   }
 
-  private initializeBoard(): Record<string, ChessPiece> {
+  private initializeBoard(): GameState {
     // Initialize an empty board - implement actual chess setup
-    return {};
+    return {
+      pieces: [],
+      selectedPiece: null,
+      currentTurn: 'red',
+      gameStatus: 'active'
+    };
   }
 
-  make_move(fromSquare: string, toSquare: string): boolean {
-    // Implement your move logic here
-    const piece = this.board[fromSquare];
-    if (piece && piece.color === this.currentTurn) {
-      this.board[toSquare] = piece;
-      delete this.board[fromSquare];
-      this.currentTurn = this.currentTurn === 'white' ? 'black' : 'white';
-      return true;
-    }
-    return false;
+  public toFen(): string {
+    // Convert the game state to FEN format
+
+    return '';
   }
 
-  get_current_turn(): PieceColor {
-    return this.currentTurn;
-  }
-
-  get_game_status(): GameState['game_status'] {
-    return this.gameStatus;
-  }
-
-  get_board(): Record<string, ChessPiece> {
-    return this.board;
-  }
 }
 
 // Create a singleton instance
