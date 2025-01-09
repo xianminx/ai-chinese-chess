@@ -23,7 +23,7 @@ export function parseMove(move: string): [Position, Position] | null {
         return null; // Invalid move format
     }
 
-    const [_, fromFile, fromRank, toFile, toRank] = match;
+    const [, fromFile, fromRank, toFile, toRank] = match;
 
     // Convert files ('a' to 'i') to 0-8
     const fileToNumber = (file: string): number =>
