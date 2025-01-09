@@ -45,7 +45,7 @@ export default function Game() {
                         gameState={gameState}
                         onMove={onMove}
                         onSelect={onSelect}
-                        onInvalidTurn={(message) => toast.error(message)}
+                        onError={(message) => toast.error(message, { duration: 1000 })}
                     />
                 </div>
 

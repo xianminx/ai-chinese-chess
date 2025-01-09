@@ -1,20 +1,30 @@
 import { ChessState, Position, Piece } from '../lib/GameTypes';
 
+// 棋子走法验证规则
+
+// 检查是否在棋盘范围内
 const isWithinBoard = (pos: Position): boolean => {
   return pos.x >= 0 && pos.x < 9 && pos.y >= 0 && pos.y < 10;
 };
 
+// 检查是否同一位置
 const isSamePosition = (pos1: Position, pos2: Position): boolean => {
   return pos1.x === pos2.x && pos1.y === pos2.y;
 };
 
-// Helper function to check if a position is within a player's palace
+// 检查是否在九宫格内
+// 帅(将)不能离开九宫格：上三行，左右各三列
 const isInPalace = (pos: Position, color: 'red' | 'black'): boolean => {
   const y = color === 'red' ? [7, 8, 9] : [0, 1, 2];
   return pos.x >= 3 && pos.x <= 5 && y.includes(pos.y);
 };
 
-// General move validation: Can only move within palace (3x3 grid)
+// 将/帅走法验证
+// 规则：
+// 1. 只能在九宫格内移动
+// 2. 每次只能走一步（上下左右）
+// 3. 不能与对方老将对面（将帅对面）
+// 4. 不能送将（移动后不能被将军）
 const isValidGeneralMove = (piece: Piece, from: Position, to: Position): boolean => {
   if (!isInPalace(to, piece.color)) return false;
   const dx = Math.abs(to.x - from.x);
@@ -22,15 +32,34 @@ const isValidGeneralMove = (piece: Piece, from: Position, to: Position): boolean
   return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
 };
 
-// Advisor move validation: Can only move diagonally within the palace
-const isValidAdvisorMove = (piece: Piece, from: Position, to: Position): boolean => {
+// 士/仕走法验证
+// 规则：
+// 1. 只能在九宫格内移动
+// 2. 只能斜着走，每次一格
+// 3. 不能离开己方区域
+// 4. 不能吃自己的子
+const isValidAdvisorMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
+  // Must stay in palace
   if (!isInPalace(to, piece.color)) return false;
+  
+  // Must move diagonally one step
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
-  return dx === 1 && dy === 1;
+  if (dx !== 1 || dy !== 1) return false;
+
+  // Check target position
+  const targetPiece = gameState.board[to.y][to.x];
+  if (targetPiece && targetPiece.color === piece.color) {
+    return false; // Cannot capture own piece
+  }
+
+  return true;
 };
 
-// 马走日 Chariot move validation: Can move horizontally or vertically any number of squares
+// 车/俥走法验证
+// 规则：
+// 1. 直线走，横向或纵向，步数不限
+// 2. 不能越过其他棋子
 const isValidChariotMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
@@ -52,34 +81,67 @@ const isValidChariotMove = (gameState: ChessState, piece: Piece, from: Position,
   return true;
 };
 
-// Horse move validation: Moves like an "L" shape
-const isValidHorseMove = (piece: Piece, from: Position, to: Position): boolean => {
+// 马走法验证
+// 规则：
+// 1. 走"日"字，即两格直线加一格侧面
+// 2. 不能蹩马腿（马腿位置不能有棋子）
+const isValidHorseMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
-  return (dx === 1 && dy === 2) || (dx === 2 && dy === 1);
+  
+  if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) return false;
+  
+  // Check for blocking piece at the "horse leg" position
+  const legX = from.x + (dx === 2 ? (to.x > from.x ? 1 : -1) : 0);
+  const legY = from.y + (dy === 2 ? (to.y > from.y ? 1 : -1) : 0);
+  
+  return gameState.board[legY][legX] === null;
 };
 
-// Soldier move validation: Can move forward one step, or sideways after crossing the river
-const isValidSoldierMove = (piece: Piece, from: Position, to: Position): boolean => {
+// 兵/卒走法验证
+// 规则：
+// 1. 未过河只能向前走
+// 2. 过河后可以横着走
+// 3. 不能后退
+// 4. 每次只能走一步
+// 5. 不能吃自己的子
+const isValidSoldierMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
-  const dy = Math.abs(to.y - from.y);
-  if (piece.color === 'red' && from.y < 5) {
-    return dx === 0 && dy === 1; // Only move forward in the red half
-  } else if (piece.color === 'black' && from.y > 4) {
-    return dx === 0 && dy === 1; // Only move forward in the black half
+  const dy = to.y - from.y; // Not using abs() to check direction
+  
+  // Red moves up (-1), Black moves down (+1)
+  const forwardDirection = piece.color === 'red' ? -1 : 1;
+  
+  // Check if crossed river (红子过河线是4，黑子过河线是5)
+  const hasCrossedRiver = piece.color === 'red' ? from.y <= 4 : from.y >= 5;
+  
+  // Target position check
+  const targetPiece = gameState.board[to.y][to.x];
+  if (targetPiece && targetPiece.color === piece.color) {
+    return false; // Cannot capture own piece
+  }
+
+  if (!hasCrossedRiver) {
+    // Before crossing river: can only move forward one step
+    return dx === 0 && dy === forwardDirection;
   } else {
-    return (dx === 0 && dy === 1) || (dx === 1 && dy === 0); // Move forward or sideways after crossing the river
+    // After crossing river: can move forward or sideways one step
+    return (dx === 0 && dy === forwardDirection) || // Forward
+           (dy === 0 && dx === 1); // Sideways
   }
 };
 
-// Cannon move validation: Moves like a chariot, but must jump over at least one piece
+// 炮走法验证
+// 规则：
+// 1. 直线走，横向或纵向，步数不限
+// 2. 不吃子时不能越过任何棋子
+// 3. 吃子时必须越过一个棋子（炮架）且只能越过一个
 const isValidCannonMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
   
-  if (dx !== 0 && dy !== 0) return false; // The Cannon must move in a straight line (either horizontally or vertically)
+  if (dx !== 0 && dy !== 0) return false; // Must move in straight line
 
-  // Determine direction of movement
   const stepX = to.x > from.x ? 1 : to.x < from.x ? -1 : 0;
   const stepY = to.y > from.y ? 1 : to.y < from.y ? -1 : 0;
 
@@ -87,35 +149,60 @@ const isValidCannonMove = (gameState: ChessState, piece: Piece, from: Position, 
   let y = from.y + stepY;
   let foundPiece = false;
 
+  // Count pieces between from and to positions
   while (x !== to.x || y !== to.y) {
     const pieceAtPosition = gameState.board[y][x];
-
     if (pieceAtPosition) {
       if (foundPiece) {
-        // The Cannon can only jump over exactly one piece, no more
-        return false;
+        return false; // Cannot jump over more than one piece
       }
-      foundPiece = true;  // Found the first piece to jump over
+      foundPiece = true;
     }
-    
     x += stepX;
     y += stepY;
   }
 
-  // If the target position has no piece or the piece is of the opposite color, the move is valid
+  // Get target position piece
   const targetPiece = gameState.board[to.y][to.x];
 
   if (targetPiece) {
-    if (targetPiece.color === piece.color) {
-      return false; // Can't capture your own piece
+    // If capturing, must jump exactly one piece
+    if (!foundPiece || targetPiece.color === piece.color) {
+      return false;
     }
+    return true;
+  } else {
+    // If not capturing, cannot jump any pieces
+    return !foundPiece;
   }
-
-  return foundPiece;  // The move is valid only if a piece was found in the middle of the move
 };
 
+// 相/象走法验证
+// 规则：
+// 1. 走"田"字，即斜着走两格
+// 2. 不能过河
+// 3. 不能塞象眼（象眼位置不能有棋子）
+const isValidBishopMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
+  const dx = Math.abs(to.x - from.x);
+  const dy = Math.abs(to.y - from.y);
+  
+  // Must move exactly 2 steps diagonally
+  if (dx !== 2 || dy !== 2) return false;
+  
+  // Cannot cross the river
+  if (piece.color === 'red' && to.y < 5) return false;
+  if (piece.color === 'black' && to.y > 4) return false;
+  
+  // Check if the "elephant eye" (middle point) is blocked
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  if (gameState.board[midY][midX] !== null) return false;
+  
+  return true;
+};
 
-// Check if a move puts the general in check
+// 检查将军
+// 规则：判断是否有敌方棋子可以直接吃到将/帅
 const isGeneralInCheck = (gameState: ChessState, generalPosition: Position, color: 'red' | 'black'): boolean => {
   // Iterate through all enemy pieces and check if any can reach the general
   for (let y = 0; y < gameState.board.length; y++) {
@@ -131,7 +218,62 @@ const isGeneralInCheck = (gameState: ChessState, generalPosition: Position, colo
   return false; // The general is not in check
 };
 
-// Main move validation function
+// 将帅对面检查
+// 规则：
+// 1. 将帅不能在同一列直接对面
+// 2. 如果在同一列，中间必须有其他棋子
+const isGeneralsFacing = (gameState: ChessState, from: Position, to: Position): boolean => {
+  let redGeneral: Position | null = null;
+  let blackGeneral: Position | null = null;
+  
+  // Find current positions of both generals
+  for (let y = 0; y < gameState.board.length; y++) {
+    for (let x = 0; x < gameState.board[y].length; x++) {
+      const piece = gameState.board[y][x];
+      if (piece) {
+        if ((piece.type === '帥' || piece.type === '帅') && piece.color === 'red') {
+          redGeneral = {x, y};
+        } else if (piece.type === '将' && piece.color === 'black') {
+          blackGeneral = {x, y};
+        }
+      }
+    }
+  }
+
+  // Update position if we're moving a general
+  const movingPiece = gameState.board[from.y][from.x];
+  if (movingPiece?.type.match(/[将帥帅]/)) {
+    if (movingPiece.color === 'red') {
+      redGeneral = to;
+    } else {
+      blackGeneral = to;
+    }
+  }
+
+  if (!redGeneral || !blackGeneral) return false;
+
+  // Check if generals would be in same column
+  if (redGeneral.x !== blackGeneral.x) return false;
+
+  // Check if there are any pieces between them
+  const startY = Math.min(redGeneral.y, blackGeneral.y) + 1;
+  const endY = Math.max(redGeneral.y, blackGeneral.y);
+  
+  for (let y = startY; y < endY; y++) {
+    if (gameState.board[y][redGeneral.x] !== null) {
+      return false; // There's a piece between them
+    }
+  }
+
+  return true; // Generals are facing each other
+};
+
+// 主要走法验证函数
+// 规则：
+// 1. 检查是否轮到该方走子
+// 2. 检查目标位置是否在棋盘内
+// 3. 检查目标位置是否有己方棋子
+// 4. 根据不同棋子类型验证走法
 export const isValidMove = (
   gameState: ChessState,
   from: Position,
@@ -151,23 +293,29 @@ export const isValidMove = (
   switch (piece.type) {
     case '将':
     case '帥':
-      // General can't move into check
-      if (isGeneralInCheck(gameState, to, piece.color)) return false;
-      return isValidGeneralMove(piece, from, to);
+    case '帅':
+      if (!isValidGeneralMove(piece, from, to)) return false;
+      if (isGeneralsFacing(gameState, from, to)) return false;
+      return !isGeneralInCheck(gameState, to, piece.color);
     case '士':
-      return isValidAdvisorMove(piece, from, to);
+    case '仕':
+      return isValidAdvisorMove(gameState, piece, from, to);
     case '车':
     case '車':
+    case '俥':
       return isValidChariotMove(gameState, piece, from, to);
     case '马':
     case '馬':
-      return isValidHorseMove(piece, from, to);
+      return isValidHorseMove(gameState, piece, from, to);
     case '兵':
     case '卒':
-      return isValidSoldierMove(piece, from, to);
+      return isValidSoldierMove(gameState, piece, from, to);
     case '炮':
     case '砲':
       return isValidCannonMove(gameState, piece, from, to);
+    case '相':
+    case '象': 
+      return isValidBishopMove(gameState, piece, from, to);
     default:
       return false; // Invalid piece type
   }
