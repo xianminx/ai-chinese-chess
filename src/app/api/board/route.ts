@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { gameInstance } from '@/lib/gameController';
+import { gameInstance } from '@/lib/CChess';
 import type { GameState } from '@/lib/types';
 
 export async function GET() {

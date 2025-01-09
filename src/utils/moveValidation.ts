@@ -1,4 +1,4 @@
-import { GameState, Position, Piece } from '../types/GameTypes';
+import { ChessState, Position, Piece } from '../lib/GameTypes';
 
 const isWithinBoard = (pos: Position): boolean => {
   return pos.x >= 0 && pos.x < 9 && pos.y >= 0 && pos.y < 10;
@@ -30,8 +30,8 @@ const isValidAdvisorMove = (piece: Piece, from: Position, to: Position): boolean
   return dx === 1 && dy === 1;
 };
 
-// Chariot move validation: Can move horizontally or vertically any number of squares
-const isValidChariotMove = (gameState: GameState, piece: Piece, from: Position, to: Position): boolean => {
+// 马走日 Chariot move validation: Can move horizontally or vertically any number of squares
+const isValidChariotMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
   if (dx !== 0 && dy !== 0) return false; // Chariot moves in a straight line
@@ -42,7 +42,7 @@ const isValidChariotMove = (gameState: GameState, piece: Piece, from: Position, 
   let x = from.x + stepX;
   let y = from.y + stepY;
   while (x !== to.x || y !== to.y) {
-    if (gameState.pieces.some(p => p.position.x === x && p.position.y === y)) {
+    if (gameState.board[y][x] !== null) {
       return false; // Blocked by another piece
     }
     x += stepX;
@@ -73,7 +73,7 @@ const isValidSoldierMove = (piece: Piece, from: Position, to: Position): boolean
 };
 
 // Cannon move validation: Moves like a chariot, but must jump over at least one piece
-const isValidCannonMove = (gameState: GameState, piece: Piece, from: Position, to: Position): boolean => {
+const isValidCannonMove = (gameState: ChessState, piece: Piece, from: Position, to: Position): boolean => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
   
@@ -85,11 +85,10 @@ const isValidCannonMove = (gameState: GameState, piece: Piece, from: Position, t
 
   let x = from.x + stepX;
   let y = from.y + stepY;
-  let foundPiece = false;  // Flag to track if we encounter a piece in the way
+  let foundPiece = false;
 
-  // Traverse from the starting position to the target position
   while (x !== to.x || y !== to.y) {
-    const pieceAtPosition = gameState.pieces.find(p => p.position.x === x && p.position.y === y);
+    const pieceAtPosition = gameState.board[y][x];
 
     if (pieceAtPosition) {
       if (foundPiece) {
@@ -99,13 +98,12 @@ const isValidCannonMove = (gameState: GameState, piece: Piece, from: Position, t
       foundPiece = true;  // Found the first piece to jump over
     }
     
-    // Move one step closer to the target position
     x += stepX;
     y += stepY;
   }
 
   // If the target position has no piece or the piece is of the opposite color, the move is valid
-  const targetPiece = gameState.pieces.find(p => p.position.x === to.x && p.position.y === to.y);
+  const targetPiece = gameState.board[to.y][to.x];
 
   if (targetPiece) {
     if (targetPiece.color === piece.color) {
@@ -118,12 +116,15 @@ const isValidCannonMove = (gameState: GameState, piece: Piece, from: Position, t
 
 
 // Check if a move puts the general in check
-const isGeneralInCheck = (gameState: GameState, generalPosition: Position, color: 'red' | 'black'): boolean => {
+const isGeneralInCheck = (gameState: ChessState, generalPosition: Position, color: 'red' | 'black'): boolean => {
   // Iterate through all enemy pieces and check if any can reach the general
-  for (const piece of gameState.pieces) {
-    if (piece.color !== color) {
-      if (isValidMove(gameState, piece.position, generalPosition)) {
-        return true; // The general is in check
+  for (let y = 0; y < gameState.board.length; y++) {
+    for (let x = 0; x < gameState.board[y].length; x++) {
+      const piece = gameState.board[y][x];
+      if (piece && piece.color !== color) {
+        if (isValidMove(gameState, {x, y}, generalPosition)) {
+          return true; // The general is in check
+        }
       }
     }
   }
@@ -132,22 +133,18 @@ const isGeneralInCheck = (gameState: GameState, generalPosition: Position, color
 
 // Main move validation function
 export const isValidMove = (
-  gameState: GameState,
+  gameState: ChessState,
   from: Position,
   to: Position
 ): boolean => {
-  const piece = gameState.pieces.find(p => 
-    p.position.x === from.x && p.position.y === from.y
-  );
+  const piece = gameState.board[from.y][from.x];
 
   if (!piece || piece.color !== gameState.currentTurn) return false; // Piece not found or not the current player's turn
   if (!isWithinBoard(to)) return false;
   if (isSamePosition(from, to)) return false;
 
   // Check if target position has a friendly piece
-  const targetPiece = gameState.pieces.find(p =>
-    p.position.x === to.x && p.position.y === to.y
-  );
+  const targetPiece = gameState.board[to.y][to.x];
   if (targetPiece && targetPiece.color === piece.color) return false;
 
   // Validate moves based on piece type

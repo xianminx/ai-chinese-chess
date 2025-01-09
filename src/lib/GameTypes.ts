@@ -9,12 +9,12 @@ export interface Position {
 export interface Piece {
   type: string;
   color: PlayerColor;
-  position: Position;
 }
 
-export interface GameState {
-  pieces: Piece[];
-  selectedPiece: Piece | null;
+export interface ChessState {
+  // 9x10 board for Chinese Chess, null represents empty cell
+  board: (Piece | null)[][];
+  selectedPosition: Position | null;
   currentTurn: PlayerColor;
   gameStatus: GameStatus;
-} 
+}

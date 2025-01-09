@@ -1,31 +1,33 @@
 "use client";
-import { Piece, Position, GameState } from "../types/GameTypes";
+import { Position, ChessState } from "../lib/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
 import { useEffect, useRef, useState } from "react";
-import { isValidMove } from "../utils/moveValidation";
 
 interface ChessboardProps {
-    gameState: GameState;
-    onPieceSelect: (piece: Piece | null) => void;
-    onPieceMove: (from: Position, to: Position) => void;
+    gameState: ChessState;
+    onMove: (from: Position, to: Position) => boolean;
+    onSelect: (position: Position | null) => void;
+    onInvalidTurn: (message: string) => void;
 }
 
 export default function Chessboard({
     gameState,
-    onPieceSelect,
-    onPieceMove,
+    onMove,
+    onSelect,
+    onInvalidTurn,
 }: ChessboardProps) {
-    const { pieces, selectedPiece } = gameState;
     const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
     const [cellSize, setCellSize] = useState(0);
     const clickAudioRef = useRef<HTMLAudioElement | null>(null);
     const selectAudioRef = useRef<HTMLAudioElement | null>(null);
+    const warningAudioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         // Initialize audio instances
         clickAudioRef.current = new Audio("/audio/click.wav");
         selectAudioRef.current = new Audio("/audio/select.wav");
+        warningAudioRef.current = new Audio("/audio/warning.mp3");
     }, []);
 
     const playMoveSound = () => {
@@ -41,6 +43,14 @@ export default function Chessboard({
             selectAudioRef.current.play();
         }
     };
+
+    const playWarningSound = () => {
+        if (warningAudioRef.current) {
+            warningAudioRef.current.currentTime = 0;
+            warningAudioRef.current.play();
+        }
+    };
+
     useEffect(() => {
         const updateBoardSize = () => {
             const vw = Math.min(window.innerWidth, 800);
@@ -55,30 +65,34 @@ export default function Chessboard({
         return () => window.removeEventListener("resize", updateBoardSize);
     }, []);
 
-    const selectPiece = (piece: Piece | null) => {
-        playSelectSound();
-        onPieceSelect(piece);
-    };
-
-    const movePiece = (from: Position, to: Position) => {
-        playMoveSound();
-        onPieceMove(from, to);
-    };
-
     const handleCellClick = (position: Position) => {
-        const pieceAtPosition = pieces.find(
-            (p) => p.position.x === position.x && p.position.y === position.y
-        );
-
-        if (selectedPiece) {
-            if (isValidMove(gameState, selectedPiece.position, position)) {
-                movePiece(selectedPiece.position, position);
-                selectPiece(null);
+        const { selectedPosition, currentTurn } = gameState;
+        const pieceAtPosition = gameState.board[position.y][position.x];
+        
+        if (selectedPosition) {
+            if (onMove(selectedPosition, position)) {
+                playMoveSound();
             } else if (pieceAtPosition) {
-                selectPiece(pieceAtPosition);
+                if(currentTurn === pieceAtPosition.color) {
+                    playSelectSound();
+                    onSelect(position);
+                } else {
+                    playWarningSound();
+                    onInvalidTurn("Invalid reselect!");
+                }
+            } else {
+                playWarningSound();
+                onSelect(null);
+                onInvalidTurn("Invalid Move!");
             }
         } else if (pieceAtPosition) {
-            selectPiece(pieceAtPosition);
+            if (currentTurn === pieceAtPosition.color) {
+                playSelectSound();
+                onSelect(position);
+            } else {
+                playWarningSound();
+                onInvalidTurn("Wrong turn!");
+            }
         }
     };
 
@@ -90,10 +104,11 @@ export default function Chessboard({
     };
 
     const renderCell = (position: Position) => {
-        const piece = pieces.find(
-            (p) => p.position.x === position.x && p.position.y === position.y
-        );
+        const piece = gameState.board[position.y][position.x];
         const { left, top } = getPixelPosition(position);
+        const isSelected = gameState.selectedPosition?.x === position.x && 
+                          gameState.selectedPosition?.y === position.y;
+
         return (
             <Cell
                 key={`${position.x}-${position.y}`}
@@ -105,11 +120,7 @@ export default function Chessboard({
                     width: `${cellSize}px`,
                     height: `${cellSize}px`,
                 }}
-                isSelected={Boolean(
-                    selectedPiece &&
-                        selectedPiece.position.x === position.x &&
-                        selectedPiece.position.y === position.y
-                )}
+                isSelected={isSelected}
                 onClick={() => handleCellClick(position)}
             />
         );
@@ -125,8 +136,8 @@ export default function Chessboard({
                     height: `${boardSize.height}px`,
                 }}
             >
-                {Array.from({ length: 9 }, (_, x) =>
-                    Array.from({ length: 10 }, (_, y) => renderCell({ x, y }))
+                {gameState.board.map((row, y) =>
+                    row.map((_, x) => renderCell({ x, y }))
                 )}
             </div>
         </div>

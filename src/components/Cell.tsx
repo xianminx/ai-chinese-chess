@@ -1,7 +1,7 @@
-import { Piece } from "../types/GameTypes";
+import { Piece } from "../lib/GameTypes";
 
 interface CellProps {
-    piece: Piece | undefined;
+    piece: Piece | null;
     isSelected: boolean;
     onClick: () => void;
     style?: React.CSSProperties;
