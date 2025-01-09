@@ -25,8 +25,8 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
         flex items-center justify-center
         cursor-pointer 
         transition-all duration-200
-        ${piece ? "bg-gray-100" : "bg-transparent"}
-        ${isSelected ? "ring-[15%] ring-yellow-400 bg-yellow-200" : ""}
+        ${piece ? "bg-gray-100 ring-2 ring-inset ring-gray-300" : ""}
+        ${isSelected ? "ring-2 ring-yellow-400 bg-yellow-200" : ""}
         hover:brightness-95
       `}
             style={style}
@@ -35,8 +35,8 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
             {piece && (
                 <span
                     className={`
-          w-full h-full flex items-center justify-center
-          text-[60%] leading-none
+          w-[85%] h-[85%] flex items-center justify-center
+          text-[60%] leading-none rounded-full ring-1 ring-inset ring-gray-800
           ${piece.color === "red" ? "text-red-600" : "text-black"}
         `}
                     style={{ fontSize: fontSize }}

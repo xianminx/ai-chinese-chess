@@ -125,8 +125,8 @@ export default function Chessboard({
                     height: `${boardSize.height}px`,
                 }}
             >
-                {Array.from({ length: 10 }, (_, x) =>
-                    Array.from({ length: 11 }, (_, y) => renderCell({ x, y }))
+                {Array.from({ length: 9 }, (_, x) =>
+                    Array.from({ length: 10 }, (_, y) => renderCell({ x, y }))
                 )}
             </div>
         </div>
