@@ -1,32 +1,36 @@
-import { NextResponse } from 'next/server';
-import { gameInstance } from '@/lib/CChess';
-import type { MoveRequest } from '@/lib/types';
+import { NextResponse } from "next/server";
+import type { ChessState } from "@/lib/GameTypes";
+import { ChessAI } from "./chessAI";
 
 export async function POST(request: Request) {
-  try {
-    const body: MoveRequest = await request.json();
-    const { from_square, to_square } = body;
+    try {
+        const chessState: ChessState = await request.json();
 
-    const success = gameInstance.make_move(from_square, to_square);
+        const ai = new ChessAI();
+        const move = await ai.getMove(chessState);
 
-    if (success) {
-      return NextResponse.json({
-        success: true,
-        board: gameInstance.get_board(),
-        current_turn: gameInstance.get_current_turn(),
-        game_status: gameInstance.get_game_status(),
-      });
-    } else {
-      return NextResponse.json(
-        { error: 'Invalid move' },
-        { status: 400 }
-      );
+        if (!move) {
+            return NextResponse.json(
+                { success: false, error: "No move found" },
+                { status: 400 }
+            );
+        }
+
+        return NextResponse.json({
+            success: true,
+            move: move,
+        });
+    } catch (error: unknown) {
+        console.error("Error processing move:", error);
+        return NextResponse.json(
+            {
+                success: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Internal Server Error",
+            },
+            { status: 400 }
+        );
     }
-  } catch (error: unknown) {
-    console.error('Error processing move:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal Server Error' },
-      { status: 400 }
-    );
-  }
-} 
+}

@@ -111,7 +111,9 @@ export class CChess {
     return '';  // TODO: Implement FEN string generation
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public static fromFen(fen: string): ChessState {
+    // TODO: Implement FEN parsing
     return INITIAL_GAME_STATE;  // TODO: Implement FEN parsing
   }
 }
