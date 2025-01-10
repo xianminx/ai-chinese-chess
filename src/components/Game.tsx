@@ -1,9 +1,9 @@
 "use client";
 import Chessboard from "./Chessboard";
 import { useCChessState } from "../hooks/useGameState";
-import { Toaster, toast } from 'react-hot-toast';
-import { useRef, useEffect, useState } from 'react';
-import { getAIMove } from '../lib/askAi';
+import { Toaster, toast } from "react-hot-toast";
+import { useRef, useEffect, useState } from "react";
+import { getAIMove } from "../lib/askAi";
 
 export default function Game() {
     const { gameState, onMove, onSelect, onReset } = useCChessState();
@@ -36,14 +36,18 @@ export default function Game() {
     const handleAskAI = async () => {
         setIsThinking(true);
         try {
-            const { move, message } = await getAIMove(gameState);
-            toast.success(message, {
-                duration: 3000,
-            });
-            const [from, to] = move;
-            onMove(from, to);
+            const { success, aimove, message, debugInfo } = await getAIMove(gameState);
+            if (aimove && success) {
+                toast.success(message, {
+                    duration: 3000,
+                });
+                const [from, to] = aimove;
+                onMove(from, to);
+                console.log(debugInfo);
+            }
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : '获取AI建议时出错';
+            const errorMessage =
+                error instanceof Error ? error.message : "获取AI建议时出错";
             toast.error(errorMessage);
         } finally {
             setIsThinking(false);
@@ -55,14 +59,21 @@ export default function Game() {
             <Toaster position="top-center" />
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
                 <div className="w-full flex items-center justify-between px-4 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-800">中国象棋</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        中国象棋
+                    </h1>
                     <div className="flex items-center gap-6">
                         <div className="text-lg text-gray-600">
-                            当前: {
-                                gameState.currentTurn === "red" ? 
-                                <span className="text-red-400 font-bold text-lg">红方</span> : 
-                                <span className="text-black font-bold text-lg">黑方</span>
-                            }
+                            当前:{" "}
+                            {gameState.currentTurn === "red" ? (
+                                <span className="text-red-400 font-bold text-lg">
+                                    红方
+                                </span>
+                            ) : (
+                                <span className="text-black font-bold text-lg">
+                                    黑方
+                                </span>
+                            )}
                         </div>
                         <button
                             className="inline-flex items-center justify-center rounded-md text-sm font-medium
@@ -74,7 +85,7 @@ export default function Game() {
                             onClick={handleAskAI}
                             disabled={isThinking}
                         >
-                            {isThinking ? '思考中...' : '询问AI'}
+                            {isThinking ? "思考中..." : "询问AI"}
                         </button>
                         <button
                             className="inline-flex items-center justify-center rounded-md text-sm font-medium
@@ -95,7 +106,9 @@ export default function Game() {
                         gameState={gameState}
                         onMove={onMove}
                         onSelect={onSelect}
-                        onError={(message) => toast.error(message, { duration: 1000 })}
+                        onError={(message) =>
+                            toast.error(message, { duration: 1000 })
+                        }
                     />
                 </div>
             </div>

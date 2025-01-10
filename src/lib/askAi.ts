@@ -1,9 +1,9 @@
 import { ChessState, Position } from "./GameTypes";
-import { parseMove, isValidUCIMove } from "./ucci";
+import { parseMove } from "./ucci";
 
 export async function getAIMove(
     chessState: ChessState
-): Promise<{ move: [Position, Position]; message: string }> {
+): Promise<{ success: boolean; aimove?: [Position, Position]; message?: string; debugInfo?: object }> {
     const response = await fetch("/api/move", {
         method: "POST",
         headers: {
@@ -13,13 +13,17 @@ export async function getAIMove(
     });
 
     const data = await response.json();
-    if (!isValidUCIMove(data.move)) {
-        throw new Error("AI未能提供有效的移动建议");
-    } else {
-        const [from, to] = parseMove(data.move) as [Position, Position];
+    const { success, move } = data;
+    if (success) {
+        const [from, to] = parseMove(move) as [Position, Position];
         return {
-            move: [from, to],
-            message: `AI建议移动: ${[from, to]}`,
+            ...data,
+            aimove: [from, to],
+            message: `AI建议移动: ${from.x},${from.y} -> ${to.x},${to.y}`,
         };
     }
+    return {
+        ...data,
+        message: "AI未能提供有效的移动建议",
+    };
 }
