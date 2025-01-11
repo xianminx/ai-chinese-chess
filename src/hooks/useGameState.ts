@@ -8,12 +8,15 @@ export const useCChessState = () => {
 
   const handleMove = useCallback((from: Position, to: Position) => {
     if (gameRef.current.isValidMove(from, to)) {
+      console.log("valid move", gameState.currentTurn, from, to);
+      console.log("gameref move", gameRef.current.getGameState().currentTurn, from, to);
       gameRef.current.movePiece(from, to);
       setGameState(gameRef.current.getGameState());
       return true;
     }
+    console.log("invalid move", from, to);
     return false;
-  }, []);
+  }, [gameState]);
 
   const handlePieceSelect = useCallback((position: Position | null) => {
     gameRef.current.selectPiece(position);

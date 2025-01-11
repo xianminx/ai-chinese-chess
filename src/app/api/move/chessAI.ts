@@ -12,7 +12,7 @@ export class ChessAI {
 
     constructor() {
         this.client = new OpenAI();
-        this.difficulty = "intermediate";
+        this.difficulty = "advanced";
     }
 
     async getMove(
@@ -89,7 +89,7 @@ export class ChessAI {
 
     private createPrompt(fen: string): string {
         return `
-            Current position (FEN): ${fen}
+            Current position (FEN): ${fen}. The upper case letters are red, the lower case letters are black.
 
             You are an AI tasked with selecting the best move for this position in Chinese Chess (中国象棋).
             Please analyze the position with a focus on the following factors:
@@ -101,12 +101,19 @@ export class ChessAI {
             - **Pawn Structure**: Look at the pawn formation, particularly whether pawns are advanced or blocked and how they can promote or obstruct the opponent’s pieces.
             - **Tactical Opportunities**: Spot threats of captures, forks, pins, and other tactical motifs that could lead to a favorable position.
 
-            Respond **only** in JSON format, like the following example:
-            {
-                "move": "e2e4"
-            }
+
             Do not include any other information, just the JSON response.
-        `;
+
+            例: 
+            当前初始棋谱: RNBAKABNR/9/1C5C1/P1P1P1P1P/9/9/p1p1p1p1p/1c5c1/9/rnbakabnr r - - 0 1
+            r 表示 红方走棋， 红方可以 b8e8, 炮二平五
+
+
+            Respond **only** in JSON format, like the following example:            {
+                "move": "b8be",
+                "explanation": "现在轮到红方走棋， 红炮从b8移动到e8",
+            }
+            `;
     }
 
     setDifficulty(level: Difficulty): void {

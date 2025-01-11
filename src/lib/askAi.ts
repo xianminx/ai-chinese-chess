@@ -16,10 +16,12 @@ export async function getAIMove(
     const { success, move } = data;
     if (success) {
         const [from, to] = parseMove(move) as [Position, Position];
+        const message = `AI建议移动: ${move} | ${from.x},${from.y} -> ${to.x},${to.y}`;
+        console.log(message);
         return {
             ...data,
             aimove: [from, to],
-            message: `AI建议移动: ${from.x},${from.y} -> ${to.x},${to.y}`,
+            message,
         };
     }
     return {
