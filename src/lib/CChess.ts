@@ -94,10 +94,10 @@ export class CChess {
     newBoard[from.y][from.x] = null;
 
     this.gameState = {
-      ...this.gameState,
       board: newBoard,
       selectedPosition: null,
-      currentTurn: this.gameState.currentTurn === 'red' ? 'black' : 'red'
+      currentTurn: this.gameState.currentTurn === 'red' ? 'black' : 'red',
+      gameStatus: this.gameState.gameStatus
     };
   }
 

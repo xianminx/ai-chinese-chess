@@ -2,7 +2,9 @@
 import { Position, ChessState } from "../lib/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { isSamePosition } from "../lib/util";
+import { useAudio } from "@/hooks/useAudio.tsx";
 
 interface ChessboardProps {
     gameState: ChessState;
@@ -19,37 +21,10 @@ export default function Chessboard({
 }: ChessboardProps) {
     const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
     const [cellSize, setCellSize] = useState(0);
-    const clickAudioRef = useRef<HTMLAudioElement | null>(null);
-    const selectAudioRef = useRef<HTMLAudioElement | null>(null);
-    const warningAudioRef = useRef<HTMLAudioElement | null>(null);
 
-    useEffect(() => {
-        // Initialize audio instances
-        clickAudioRef.current = new Audio("/audio/click.wav");
-        selectAudioRef.current = new Audio("/audio/select.wav");
-        warningAudioRef.current = new Audio("/audio/warning.mp3");
-    }, []);
-
-    const playMoveSound = () => {
-        if (clickAudioRef.current) {
-            clickAudioRef.current.currentTime = 0;
-            clickAudioRef.current.play();
-        }
-    };
-
-    const playSelectSound = () => {
-        if (selectAudioRef.current) {
-            selectAudioRef.current.currentTime = 0;
-            selectAudioRef.current.play();
-        }
-    };
-
-    const playWarningSound = () => {
-        if (warningAudioRef.current) {
-            warningAudioRef.current.currentTime = 0;
-            warningAudioRef.current.play();
-        }
-    };
+    const playMoveSound = useAudio("/audio/click.wav");
+    const playSelectSound = useAudio("/audio/select.wav");
+    const playWarningSound = useAudio("/audio/warning.mp3");
 
     useEffect(() => {
         const updateBoardSize = () => {
@@ -114,11 +89,8 @@ export default function Chessboard({
     const renderCell = (position: Position) => {
         const piece = gameState.board[position.y][position.x];
         const { left, top } = getPixelPosition(position);
-        const isSelected =
-            gameState.selectedPosition?.x === position.x &&
-            gameState.selectedPosition?.y === position.y;
-        console.log('renderCell: ', position, isSelected);
-
+        const isSelected = isSamePosition(gameState.selectedPosition, position);
+     
         return (
             <Cell
                 key={`${position.x}-${position.y}`}

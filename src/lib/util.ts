@@ -1,4 +1,4 @@
-import { Piece } from "./GameTypes";
+import { Piece, Position } from "./GameTypes";
 
 export const LEGAL_PIECES: { [key: string]: Piece } = {
     R: { type: "車", color: "black", char: "R" },
@@ -25,3 +25,10 @@ export function char2piece(c: string): Piece {
     return LEGAL_PIECES[c];
 }
 
+export const isSamePosition = (
+    pos1: Position | null,
+    pos2: Position | null
+) => {
+    if (!pos1 || !pos2) return false;
+    return pos1.x === pos2.x && pos1.y === pos2.y;
+};

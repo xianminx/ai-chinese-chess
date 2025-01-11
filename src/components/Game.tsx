@@ -2,26 +2,15 @@
 import Chessboard from "./Chessboard";
 import { useCChessState } from "../hooks/useGameState";
 import { Toaster, toast } from "react-hot-toast";
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import { getAIMove } from "../lib/askAi";
+import { useAudio } from "@/hooks/useAudio.tsx";
 
 export default function Game() {
     const { gameState, onMove, onSelect, onReset } = useCChessState();
-    const startAudioRef = useRef<HTMLAudioElement | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
-
-    useEffect(() => {
-        // Initialize start audio
-        startAudioRef.current = new Audio("/audio/start.mp3");
-    }, []);
-
-    const playStartSound = () => {
-        if (startAudioRef.current) {
-            startAudioRef.current.currentTime = 0;
-            startAudioRef.current.play();
-        }
-    };
+    const playStartSound = useAudio("/audio/start.mp3");
 
     const handleReset = () => {
         setShowConfirm(true);
