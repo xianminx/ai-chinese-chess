@@ -1,6 +1,6 @@
 export type PlayerColor = 'red' | 'black';
 export type GameStatus = 'active' | 'checkmate' | 'stalemate' | 'draw';
-export type PieceType = '車' | '车' | '馬' | '马' | '象' | '相' | '士' | '仕' | '卒' | '兵' | '炮' | '砲' | '帥' | '将';
+export type PieceType = '車' | '车' | '馬' | '马' | '象' | '相' | '士' | '仕' | '卒' | '兵' | '炮' | '砲' | '帅' | '将';
 export type PieceChar = 'R' | 'r' | 'N' | 'n' | 'B' | 'b' | 'A' | 'a' | 'P' | 'p' | 'C' | 'c' | 'K' | 'k';
 export interface Position {
   x: number;

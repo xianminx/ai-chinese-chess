@@ -56,7 +56,7 @@ export default function Chessboard({
             const vw = Math.min(window.innerWidth, 800);
             const width = Math.min(vw * 0.9, 500);
             const height = width * 1.1;
-            setCellSize(width / 14);
+            setCellSize(width / 10);
             setBoardSize({ width, height });
         };
 
@@ -106,8 +106,8 @@ export default function Chessboard({
 
     const getPixelPosition = (position: Position) => {
         return {
-            left: `${((position.x + 1) / 10) * boardSize.width}px`,
-            top: `${((position.y + 1) / 11) * boardSize.height}px`,
+            left: `${(position.x + 1) * cellSize}px`,
+            top: `${(position.y + 1) * cellSize}px`,
         };
     };
 
@@ -117,6 +117,7 @@ export default function Chessboard({
         const isSelected =
             gameState.selectedPosition?.x === position.x &&
             gameState.selectedPosition?.y === position.y;
+        console.log('renderCell: ', position, isSelected);
 
         return (
             <Cell
@@ -126,8 +127,8 @@ export default function Chessboard({
                     position: "absolute",
                     left: left,
                     top: top,
-                    width: `${cellSize}px`,
-                    height: `${cellSize}px`,
+                    width: `${cellSize * 0.7}px`,
+                    height: `${cellSize * 0.7}px`,
                 }}
                 isSelected={isSelected}
                 onClick={() => handleCellClick(position)}

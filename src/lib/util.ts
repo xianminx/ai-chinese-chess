@@ -12,7 +12,7 @@ export const LEGAL_PIECES: { [key: string]: Piece } = {
     n: { type: "马", color: "red", char: "n" },
     b: { type: "相", color: "red", char: "b" },
     a: { type: "士", color: "red", char: "a" },
-    k: { type: "帥", color: "red", char: "k" },
+    k: { type: "帅", color: "red", char: "k" },
     c: { type: "炮", color: "red", char: "c" },
     p: { type: "兵", color: "red", char: "p" },
 };
