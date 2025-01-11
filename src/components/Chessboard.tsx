@@ -101,10 +101,7 @@ export default function Chessboard({
     const renderCell = (piece: Piece | null, position: Position) => {
         const { left, top } = getPixelPosition(position);
         const isSelected = isSamePosition(gameState.selectedPosition, position);
-        console.log(
-            `renderCell: ${position.x}, ${position.y}, ${left}, ${top}`
-        );
-
+        
         const baseStyle: React.CSSProperties = {
             position: "absolute",
             left: `${left}px`,
