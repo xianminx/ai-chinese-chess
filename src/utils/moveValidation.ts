@@ -231,7 +231,7 @@ const isGeneralsFacing = (gameState: ChessState, from: Position, to: Position): 
     for (let x = 0; x < gameState.board[y].length; x++) {
       const piece = gameState.board[y][x];
       if (piece) {
-        if ((piece.type === '帥' || piece.type === '帅') && piece.color === 'red') {
+        if ((piece.type === '帅') && piece.color === 'red') {
           redGeneral = {x, y};
         } else if (piece.type === '将' && piece.color === 'black') {
           blackGeneral = {x, y};
@@ -242,7 +242,7 @@ const isGeneralsFacing = (gameState: ChessState, from: Position, to: Position): 
 
   // Update position if we're moving a general
   const movingPiece = gameState.board[from.y][from.x];
-  if (movingPiece?.type.match(/[将帥帅]/)) {
+  if (movingPiece?.type.match(/[将帅]/)) {
     if (movingPiece.color === 'red') {
       redGeneral = to;
     } else {
@@ -292,7 +292,6 @@ export const isValidMove = (
   // Validate moves based on piece type
   switch (piece.type) {
     case '将':
-    case '帥':
     case '帅':
       if (!isValidGeneralMove(piece, from, to)) return false;
       if (isGeneralsFacing(gameState, from, to)) return false;
@@ -302,7 +301,6 @@ export const isValidMove = (
       return isValidAdvisorMove(gameState, piece, from, to);
     case '车':
     case '車':
-    case '俥':
       return isValidChariotMove(gameState, piece, from, to);
     case '马':
     case '馬':
