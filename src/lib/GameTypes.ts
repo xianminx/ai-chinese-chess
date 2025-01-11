@@ -19,4 +19,5 @@ export interface ChessState {
   selectedPosition: Position | null;
   currentTurn: PlayerColor;
   gameStatus: GameStatus;
+  lastMove: [Position, Position] | null;
 }

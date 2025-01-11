@@ -6,6 +6,7 @@ function initGame(): ChessState {
   return {
       board: initializeBoard(),
       selectedPosition: null,
+      lastMove: null,
       currentTurn: 'red',
       gameStatus: 'active'
   };
@@ -94,10 +95,11 @@ export class CChess {
     newBoard[from.y][from.x] = null;
 
     this.gameState = {
+      ...this.gameState,
+      lastMove: [from, to],
       board: newBoard,
       selectedPosition: null,
       currentTurn: this.gameState.currentTurn === 'red' ? 'black' : 'red',
-      gameStatus: this.gameState.gameStatus
     };
   }
 
@@ -150,6 +152,7 @@ export class CChess {
 
     return {
       board: board,
+      lastMove: null,
       selectedPosition: null,
       currentTurn: turn === 'r' ? 'red' : 'black',
       gameStatus: 'active'
