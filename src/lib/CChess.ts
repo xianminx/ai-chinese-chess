@@ -1,5 +1,5 @@
 import type { ChessState, Piece, Position } from './GameTypes';
-import { isValidMove } from '@/utils/moveValidation';
+import { isValidMove } from '@/lib/moveValidation';
 import { char2piece, LEGAL_PIECES, piece2char } from './util';
 
 function initGame(): ChessState {

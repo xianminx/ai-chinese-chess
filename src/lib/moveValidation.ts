@@ -1,4 +1,4 @@
-import { ChessState, Position, Piece } from '../lib/GameTypes';
+import { ChessState, Position, Piece } from './GameTypes';
 
 // 棋子走法验证规则
 
