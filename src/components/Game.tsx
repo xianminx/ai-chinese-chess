@@ -14,21 +14,6 @@ export default function Game() {
   const [isThinking, setIsThinking] = useState(false);
   const playStartSound = useAudio("/audio/start.mp3");
   const playMoveSound = useAudio("/audio/click.wav");
-  const playEndSound = useAudio("/audio/end.mp3");
-  const [checkStatus, setCheckStatus] = useState<'none' | 'red' | 'black'>('none');
-
-  useEffect(() => {
-    if (gameState.gameStatus === 'check') {
-      setCheckStatus(gameState.currentTurn);
-      toast.error(`${gameState.currentTurn === 'red' ? '红帅' : '黑将'}被将军！`, {
-        duration: 2000,
-        position: 'top-center',
-        icon: '⚠️',
-      });
-    } else {
-      setCheckStatus('none');
-    }
-  }, [gameState]);
 
   const handleReset = () => {
     setShowConfirm(true);
@@ -128,9 +113,7 @@ export default function Game() {
   return (
     <div 
       className={`w-full min-h-screen flex items-center justify-center pt-8
-        transition-colors duration-500
-        ${checkStatus === 'red' ? 'bg-red-100/70' : 
-          checkStatus === 'black' ? 'bg-neutral-200/70' : ''}`}
+        transition-colors duration-500`}
     >
       <div className="w-full max-w-4xl flex flex-col items-center gap-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">

@@ -7,6 +7,7 @@ import { isSamePosition } from "../lib/util";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import { motion } from "motion/react";
 import { isValidMove } from "../lib/moveValidation";
+import toast from "react-hot-toast";
 
 interface ChessboardProps {
     gameState: ChessState;
@@ -28,6 +29,23 @@ export default function Chessboard({
         cellSize: 0,
     });
     const [board, setBoard] = useState(gameState.board);
+
+  const playEndSound = useAudio("/audio/end.mp3");
+  const [checkBgColor, setCheckBgColor] = useState('#F4D6A0');
+
+  useEffect(() => {
+    if (gameState.gameStatus === 'check') {
+      toast.error(`${gameState.currentTurn === 'red' ? '红帅' : '黑将'}被将军！`, {
+        duration: 2000,
+        position: 'top-center',
+        icon: '⚠️',
+      });
+
+      setCheckBgColor(gameState.currentTurn === 'red' ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.3)');
+    } else {
+      setCheckBgColor('#F4D6A0');
+    }
+  }, [gameState]);
 
     useEffect(() => {
         setBoard(gameState.board);
@@ -167,11 +185,12 @@ export default function Chessboard({
     return (
         <div className="w-full flex justify-center items-center">
             <div
-                className="relative bg-no-repeat bg-contain bg-center"
+                className={`relative bg-no-repeat bg-contain bg-center transition-colors duration-300`}
                 style={{
                     backgroundImage: `url(${BoardGrid.src})`,
                     width: `${boardSize.width}px`,
                     height: `${boardSize.height}px`,
+                    backgroundColor: `${checkBgColor}`,
                 }}
             >
                 {board.map((row, y) =>

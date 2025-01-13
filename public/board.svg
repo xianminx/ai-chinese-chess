@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="550" viewBox="0 0 500 550">
   <!-- Draw the board background -->
-  <rect x="0" y="0" width="500" height="550" fill="#F4D6A0" stroke="#000" stroke-width="2" />
+  <!-- <rect x="0" y="0" width="500" height="550" fill="rgba(244, 214, 160, 0.9)" stroke="#000" stroke-width="2" /> -->
 
   <!-- Draw the vertical lines -->
   <g stroke="#000" stroke-width="1.5">
