@@ -21,7 +21,7 @@ interface ChatComponentProps {
 export default function ChatComponent({ gameState, isThinking }: ChatComponentProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -92,12 +92,23 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
   };
 
   // Custom renderer for code blocks
-  const CodeBlock = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+  const CodeBlock = ({
+    node,
+    inline,
+    className,
+    children,
+    ...props
+  }: {
+    node?: any;
+    inline?: boolean;
+    className?: string;
+    children: React.ReactNode;
+  } & React.HTMLAttributes<HTMLElement>) => {
     const language = className?.replace('language-', '') || 'text';
     return (
       <div className="relative group">
         <pre className={`${className} rounded-md bg-gray-800 p-4 overflow-x-auto`}>
-          <code className={`language-${language} text-sm text-gray-100`}>
+          <code className={`language-${language} text-sm text-gray-100`} {...props}>
             {children}
           </code>
         </pre>
@@ -106,30 +117,7 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
   };
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end">
-      {/* Chat Toggle Button */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="mb-2 p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-full shadow-lg transition-transform active:scale-95"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d={isCollapsed 
-              ? "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              : "M6 18L18 6M6 6l12 12"}
-          />
-        </svg>
-      </button>
-
+    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end space-y-2">
       {/* Chat Window */}
       <div
         className={`${
@@ -139,11 +127,32 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
         {/* Chat Header */}
         <div className="p-4 border-b flex justify-between items-center bg-white rounded-t-lg">
           <h2 className="text-lg font-semibold text-gray-700">AI 助手</h2>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isThinking ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
-            <span className="text-sm text-gray-500">
-              {isThinking ? '思考中...' : '在线'}
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isThinking ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
+              <span className="text-sm text-gray-500">
+                {isThinking ? '思考中...' : '在线'}
+              </span>
+            </div>
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
         </div>
         
@@ -152,11 +161,11 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`px-4 py-6 ${
+              className={`px-2 py-2 ${
                 message.role === "assistant" ? "bg-white border-b border-gray-100" : "bg-gray-50"
               }`}
             >
-              <div className="max-w-[85%] mx-auto flex gap-4">
+              <div className="max-w-[100%] mx-auto flex gap-4">
                 <div className="flex-shrink-0 mt-1">
                   <Image
                     src={message.role === "user" ? "/icons/anonymous.svg" : "/icons/openai.svg"}
@@ -222,8 +231,8 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
         </div>
 
         {/* Input Form */}
-        <div className="p-4 bg-white border-t">
-          <form onSubmit={handleSubmit} className="relative">
+        <div className="p-4 bg-white border-t rounded-b-lg">
+          <form onSubmit={handleSubmit} className="relative flex items-end">
             <textarea
               ref={textareaRef}
               value={input}
@@ -231,9 +240,9 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
               onKeyDown={handleKeyDown}
               placeholder="发送消息给 AI 助手..."
               rows={1}
-              className="w-full pr-24 py-3 px-4 text-sm text-gray-700 bg-gray-50 rounded-lg 
-                       border border-gray-200 focus:outline-none focus:border-gray-300
-                       resize-none overflow-hidden"
+              className="w-full pr-24 py-2 px-3 text-sm text-gray-700 bg-gray-50 rounded-lg 
+                 border border-gray-200 focus:outline-none focus:border-gray-300
+                 resize-none min-h-[40px] max-h-[120px]"
               disabled={isThinking}
             />
             <div className="absolute right-2 bottom-2 flex items-center gap-2">
@@ -244,7 +253,7 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
                 type="submit"
                 disabled={isThinking}
                 className="p-1.5 rounded-md bg-gray-700 text-white hover:bg-gray-600
-                         disabled:opacity-50 disabled:cursor-not-allowed"
+                   disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -259,6 +268,29 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
           </form>
         </div>
       </div>
+
+      {/* Independent Chat Toggle Button */}
+      {isCollapsed && (
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="p-3 bg-gray-700 hover:bg-gray-600 text-white rounded-full shadow-lg transition-all duration-200 ease-in-out active:scale-95"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 } 
