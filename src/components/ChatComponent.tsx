@@ -122,25 +122,25 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
       <div
         className={`${
           isCollapsed ? 'hidden' : 'flex'
-        } flex-col w-80 sm:w-[440px] h-[600px] bg-white rounded-lg shadow-xl transition-all duration-200 ease-in-out border border-gray-200`}
+        } flex-col w-80 sm:w-[440px] h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-xl transition-all duration-200 ease-in-out border border-gray-200 dark:border-gray-700`}
       >
         {/* Chat Header */}
-        <div className="p-4 border-b flex justify-between items-center bg-white rounded-t-lg">
-          <h2 className="text-lg font-semibold text-gray-700">AI 助手</h2>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 rounded-t-lg">
+          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">AI 助手</h2>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isThinking ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
-              <span className="text-sm text-gray-500">
+              <div className={`w-2 h-2 rounded-full ${isThinking ? 'bg-green-500 animate-pulse' : 'bg-gray-300 dark:bg-gray-600'}`} />
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {isThinking ? '思考中...' : '在线'}
               </span>
             </div>
             <button
               onClick={() => setIsCollapsed(true)}
-              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-500"
+                className="h-5 w-5 text-gray-500 dark:text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -157,12 +157,14 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
         </div>
         
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`px-2 py-2 ${
-                message.role === "assistant" ? "bg-white border-b border-gray-100" : "bg-gray-50"
+                message.role === "assistant" 
+                  ? "bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700" 
+                  : "bg-gray-50 dark:bg-gray-900"
               }`}
             >
               <div className="max-w-[100%] mx-auto flex gap-4">
@@ -176,45 +178,58 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
                   />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <div className="font-medium text-sm text-gray-500">
+                  <div className="font-medium text-sm text-gray-500 dark:text-gray-400">
                     {message.role === "user" ? "你" : "AI 助手"}
                   </div>
-                  <div className="text-gray-700 text-sm prose prose-sm max-w-none">
+                  <div className="text-gray-700 dark:text-gray-300 text-sm prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code: CodeBlock,
-                        // Style other markdown elements
+                        code: ({ node, inline, className, children, ...props }) => {
+                          const language = className?.replace('language-', '') || 'text';
+                          return inline ? (
+                            <code className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200" {...props}>
+                              {children}
+                            </code>
+                          ) : (
+                            <div className="relative group">
+                              <pre className={`${className} rounded-md bg-gray-800 dark:bg-gray-900 p-4 overflow-x-auto`}>
+                                <code className={`language-${language} text-sm text-gray-100`} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            </div>
+                          );
+                        },
+                        // Update other markdown components
                         p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                         ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
                         ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
                         li: ({ children }) => <li className="mb-1">{children}</li>,
                         a: ({ href, children }) => (
-                          <a href={href} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                          <a href={href} className="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
                             {children}
                           </a>
                         ),
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                        em: ({ children }) => <em className="italic">{children}</em>,
                         blockquote: ({ children }) => (
-                          <blockquote className="border-l-2 border-gray-300 pl-4 italic my-2">
+                          <blockquote className="border-l-2 border-gray-300 dark:border-gray-600 pl-4 italic my-2">
                             {children}
                           </blockquote>
                         ),
                         table: ({ children }) => (
                           <div className="overflow-x-auto my-2">
-                            <table className="min-w-full divide-y divide-gray-200">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                               {children}
                             </table>
                           </div>
                         ),
                         th: ({ children }) => (
-                          <th className="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-3 py-2 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             {children}
                           </th>
                         ),
                         td: ({ children }) => (
-                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             {children}
                           </td>
                         ),
@@ -231,7 +246,7 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
         </div>
 
         {/* Input Form */}
-        <div className="p-4 bg-white border-t rounded-b-lg">
+        <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
           <form onSubmit={handleSubmit} className="relative flex items-end">
             <textarea
               ref={textareaRef}
@@ -240,20 +255,24 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
               onKeyDown={handleKeyDown}
               placeholder="发送消息给 AI 助手..."
               rows={1}
-              className="w-full pr-24 py-2 px-3 text-sm text-gray-700 bg-gray-50 rounded-lg 
-                 border border-gray-200 focus:outline-none focus:border-gray-300
-                 resize-none min-h-[40px] max-h-[120px]"
+              className="w-full pr-24 py-2 px-3 text-sm text-gray-700 dark:text-gray-200 
+                       bg-gray-50 dark:bg-gray-700 rounded-lg 
+                       border border-gray-200 dark:border-gray-600 
+                       focus:outline-none focus:border-gray-300 dark:focus:border-gray-500
+                       resize-none min-h-[40px] max-h-[120px]
+                       placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isThinking}
             />
             <div className="absolute right-2 bottom-2 flex items-center gap-2">
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {isThinking ? "思考中..." : "Enter 发送"}
               </span>
               <button
                 type="submit"
                 disabled={isThinking}
-                className="p-1.5 rounded-md bg-gray-700 text-white hover:bg-gray-600
-                   disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 rounded-md bg-gray-700 dark:bg-gray-600 text-white 
+                         hover:bg-gray-600 dark:hover:bg-gray-500
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -273,7 +292,8 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
       {isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="p-3 bg-gray-700 hover:bg-gray-600 text-white rounded-full shadow-lg transition-all duration-200 ease-in-out active:scale-95"
+          className="p-3 bg-gray-700 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-500 
+                   text-white rounded-full shadow-lg transition-all duration-200 ease-in-out active:scale-95"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
