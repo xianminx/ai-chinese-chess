@@ -37,7 +37,9 @@ export default function Game() {
         } catch (error: unknown) {
             const errorMessage =
                 error instanceof Error ? error.message : "获取AI建议时出错";
-            toast.error(errorMessage);
+            toast.error(errorMessage, {
+                duration: 3000,
+            });
         } finally {
             setIsThinking(false);
         }
@@ -45,7 +47,7 @@ export default function Game() {
 
     return (
         <div className="w-full flex items-center justify-center pt-8">
-            <Toaster position="top-center" />
+            <Toaster position="bottom-center" reverseOrder={false} />
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 bg-white">
                     <div className="flex items-center gap-2">
@@ -101,7 +103,7 @@ export default function Game() {
                         onMove={onMove}
                         onSelect={onSelect}
                         onError={(message) =>
-                            toast.error(message, { duration: 1000 })
+                            toast.error(message, { duration: 3000 })
                         }
                     />
                 </div>
