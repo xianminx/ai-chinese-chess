@@ -47,14 +47,14 @@ export default function Game() {
         <div className="w-full flex items-center justify-center pt-8">
             <Toaster position="top-center" />
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
-                <div className="w-full flex items-center justify-between px-4 mb-2">
+                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 bg-white">
                     <div className="flex items-center gap-2">
                         <Image src="/icon.svg" alt="icon" width={40} height={40} />
                         <h1 className="text-2xl font-bold text-gray-800">
                             中国象棋
                         </h1>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                         <div className="text-lg text-gray-600">
                             当前:{" "}
                             {gameState.currentTurn === "red" ? (
@@ -67,29 +67,31 @@ export default function Game() {
                                 </span>
                             )}
                         </div>
-                        <button
-                            className="inline-flex items-center justify-center rounded-md text-sm font-medium
-                                     ring-offset-white transition-colors focus-visible:outline-none 
-                                     focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
-                                     disabled:pointer-events-none disabled:opacity-50
-                                     bg-blue-600 text-white hover:bg-blue-700
-                                     active:scale-95 h-9 px-4 py-2"
-                            onClick={handleAskAI}
-                            disabled={isThinking}
-                        >
-                            {isThinking ? "思考中..." : "询问AI"}
-                        </button>
-                        <button
-                            className="inline-flex items-center justify-center rounded-md text-sm font-medium
-                                     ring-offset-white transition-colors focus-visible:outline-none 
-                                     focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
-                                     disabled:pointer-events-none disabled:opacity-50
-                                     bg-slate-900 text-slate-50 hover:bg-slate-900/90
-                                     active:scale-95 h-9 px-4 py-2"
-                            onClick={handleReset}
-                        >
-                            重新开局
-                        </button>
+                        <div className="flex gap-4">
+                            <button
+                                className="w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
+                                         ring-offset-white transition-colors focus-visible:outline-none 
+                                         focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
+                                         disabled:pointer-events-none disabled:opacity-50
+                                         bg-blue-600 text-white hover:bg-blue-700
+                                         active:scale-95 h-9 px-4 py-2"
+                                onClick={handleAskAI}
+                                disabled={isThinking}
+                            >
+                                {isThinking ? "思考中..." : "询问AI"}
+                            </button>
+                            <button
+                                className="w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
+                                         ring-offset-white transition-colors focus-visible:outline-none 
+                                         focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
+                                         disabled:pointer-events-none disabled:opacity-50
+                                         bg-slate-900 text-slate-50 hover:bg-slate-900/90
+                                         active:scale-95 h-9 px-4 py-2"
+                                onClick={handleReset}
+                            >
+                                重新开局
+                            </button>
+                        </div>
                     </div>
                 </div>
 
