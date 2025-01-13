@@ -39,6 +39,8 @@ export default function Game() {
                 <Image
                   className="h-10 w-10 rounded-full"
                   src="/icons/openai.svg"
+                  width={24}
+                  height={24}
                   alt=""
                 />
               </div>
