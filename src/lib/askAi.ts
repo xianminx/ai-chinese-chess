@@ -1,7 +1,40 @@
-import { json } from "stream/consumers";
 import { ChessState, Position } from "./GameTypes";
 import { isValidMove } from "./moveValidation";
 import { parseMove } from "./ucci";
+
+// Helper function for delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export async function getAIMoveWithRetry(
+  chessState: ChessState,
+  maxRetries: number = 3,
+  retryDelay: number = 1000
+): Promise<{
+  success: boolean;
+  aimove?: [Position, Position];
+  message?: string;
+  explanation?: string;
+  debugInfo?: object;
+}> {
+  let attempts = 0;
+  let result;
+  while (attempts < maxRetries) {
+    result = await getAIMove(chessState);
+    if (result.success) {
+      return result;
+    }
+    attempts++;
+    if (attempts < maxRetries) {
+      await delay(retryDelay);
+      console.log(`Retry attempt ${attempts} for AI move...`);
+    }
+  }
+  return {
+    success: false,
+    ...result,
+    message: `AI移动尝试${maxRetries}次均失败`,
+  };
+}
 
 export async function getAIMove(chessState: ChessState): Promise<{
   success: boolean;

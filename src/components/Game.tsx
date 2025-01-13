@@ -3,9 +3,10 @@ import Chessboard from "./Chessboard";
 import { useCChessState } from "../hooks/useGameState";
 import { Toaster, toast } from "react-hot-toast";
 import { useState } from "react";
-import { getAIMove } from "../lib/askAi";
+import { getAIMoveWithRetry } from "../lib/askAi";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
+
 export default function Game() {
   const { gameState, onMove, onSelect, onReset } = useCChessState();
   const [showConfirm, setShowConfirm] = useState(false);
@@ -72,8 +73,7 @@ export default function Game() {
 
     setIsThinking(true);
     try {
-      const { success, aimove, message, explanation, debugInfo } =
-        await getAIMove(gameState);
+      const { success, aimove, message, explanation, debugInfo } = await getAIMoveWithRetry(gameState);
       console.log("AI返回的数据", JSON.stringify({ success, aimove, message, explanation, debugInfo }));
       if (aimove && success) {
         aiThinking(
