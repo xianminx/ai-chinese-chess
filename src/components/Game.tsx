@@ -26,6 +26,7 @@ export default function Game() {
   const handleAskAI = async () => {
     const aiThinking = (message: string, explanation: string) =>
       toast.custom(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (t: any) => (
             <div
             className={`${

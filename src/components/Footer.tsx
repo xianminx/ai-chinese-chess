@@ -12,7 +12,7 @@ export default function Footer() {
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-4 py-4 text-sm text-gray-500">
                     {/* Child 1: Rules Button */}
                     <div className="text-center flex items-center gap-1">
-                        <img
+                        <Image
                             src="/icons/document.svg"
                             alt="Rules"
                             width={16}
