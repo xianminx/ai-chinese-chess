@@ -1,8 +1,8 @@
 "use client";
 import Chessboard from "./Chessboard";
 import { useCChessState } from "../hooks/useGameState";
-import { Toaster, toast } from "react-hot-toast";
-import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import { getAIMoveWithRetry } from "../lib/askAi";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
@@ -14,6 +14,22 @@ export default function Game() {
   const [isThinking, setIsThinking] = useState(false);
   const playStartSound = useAudio("/audio/start.mp3");
   const playMoveSound = useAudio("/audio/click.wav");
+  const playEndSound = useAudio("/audio/end.mp3");
+  const [checkStatus, setCheckStatus] = useState<'none' | 'red' | 'black'>('none');
+
+  useEffect(() => {
+    if (gameState.gameStatus === 'check') {
+      setCheckStatus(gameState.currentTurn);
+      toast.error(`${gameState.currentTurn === 'red' ? '红帅' : '黑将'}被将军！`, {
+        duration: 2000,
+        position: 'top-center',
+        icon: '⚠️',
+      });
+    } else {
+      setCheckStatus('none');
+    }
+  }, [gameState]);
+
   const handleReset = () => {
     setShowConfirm(true);
   };
@@ -110,10 +126,14 @@ export default function Game() {
   };
 
   return (
-    <div className="w-full flex items-center justify-center pt-8">
-      <Toaster position="bottom-center" reverseOrder={false} />
+    <div 
+      className={`w-full min-h-screen flex items-center justify-center pt-8
+        transition-colors duration-500
+        ${checkStatus === 'red' ? 'bg-red-100/70' : 
+          checkStatus === 'black' ? 'bg-neutral-200/70' : ''}`}
+    >
       <div className="w-full max-w-4xl flex flex-col items-center gap-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 bg-white w-full">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">
           <div className="flex items-center gap-2">
             <Image src="/icon.svg" alt="icon" width={40} height={40} />
             <h1 className="text-2xl font-bold text-gray-800">中国象棋</h1>

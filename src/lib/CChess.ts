@@ -95,12 +95,18 @@ export class CChess {
     newBoard[to.y][to.x] = piece;
     newBoard[from.y][from.x] = null;
 
+    const nextTurn = this.gameState.currentTurn === 'red' ? 'black' : 'red';
+    
+    // Check if the opponent's king is in check
+    const isCheck = this.isKingInCheck(newBoard, nextTurn);
+
     this.gameState = {
       ...this.gameState,
       lastMove: [from, to],
       board: newBoard,
       selectedPosition: null,
-      currentTurn: this.gameState.currentTurn === 'red' ? 'black' : 'red',
+      currentTurn: nextTurn,
+      gameStatus: isCheck ? 'check' : 'active',
     };
   }
 
@@ -158,6 +164,44 @@ export class CChess {
       currentTurn: turn === 'r' ? 'red' : 'black',
       gameStatus: 'active'
     };
+  }
+
+  private isKingInCheck(board: (Piece | null)[][], kingColor: 'red' | 'black'): boolean {
+    // First find the king's position
+    let kingPos: Position | null = null;
+    const kingPiece = kingColor === 'red' ? 'K' : 'k';
+    
+    for (let y = 0; y < board.length; y++) {
+      for (let x = 0; x < board[y].length; x++) {
+        if (board[y][x]?.char === kingPiece) {
+          kingPos = { x, y };
+          break;
+        }
+      }
+      if (kingPos) break;
+    }
+
+    if (!kingPos) return false;
+
+    // Check if any opponent piece can capture the king
+    for (let y = 0; y < board.length; y++) {
+      for (let x = 0; x < board[y].length; x++) {
+        const piece = board[y][x];
+        if (piece && piece.color !== kingColor) {
+          const from: Position = { x, y };
+          const result = isValidMove(
+            { ...this.gameState, board },
+            from,
+            kingPos
+          );
+          if (result.isValid) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }
 
