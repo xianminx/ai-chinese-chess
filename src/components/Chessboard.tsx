@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { isSamePosition } from "../lib/util";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import { motion } from "motion/react";
+import { isValidMove } from "../lib/moveValidation";
 
 interface ChessboardProps {
     gameState: ChessState;
@@ -64,27 +65,31 @@ export default function Chessboard({
         console.log("clicked: ", JSON.stringify(debugObj));
 
         if (selectedPosition) {
-            // 如果已经选择了棋子, 则进行移动， 或者重新选择棋子
+            // 如果已经选择了棋子，则进行移动或者重新选择棋子
             if (pieceAtPosition && currentTurn === pieceAtPosition.color) {
-                // 如果选择的是自己的棋子, 则重新选择棋子
+                // 如果选择的是自己的棋子，则重新选择棋子
                 playSelectSound();
                 onSelect(position);
-            } else if (onMove(selectedPosition, position)) {
-                // 移动或者吃子
-                playMoveSound();
             } else {
-                // 既不是有效移动， 也不是重新选择棋子， 为无效移动
-                playWarningSound();
-                // onSelect(null);
-                onError("无效移动!");
+                // 验证移动是否合法
+                const moveResult = isValidMove(gameState, selectedPosition, position);
+                if (moveResult.isValid) {
+                    // 移动或者吃子
+                    onMove(selectedPosition, position);
+                    playMoveSound();
+                } else {
+                    // 无效移动
+                    playWarningSound();
+                    onError(moveResult.reason || "无效移动!");
+                }
             }
         } else if (pieceAtPosition) {
-            // 如果未选择棋子, 则选择棋子
+            // 如果未选择棋子，则选择棋子
             if (currentTurn === pieceAtPosition.color) {
                 playSelectSound();
                 onSelect(position);
             } else {
-                // 如果选择的是对方的棋子, 则提示错误
+                // 如果选择的是对方的棋子，则提示错误
                 playWarningSound();
                 onError("不能选择对方的棋子!");
             }

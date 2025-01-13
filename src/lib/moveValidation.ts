@@ -1,4 +1,4 @@
-import { ChessState, Position, Piece } from './GameTypes';
+import { ChessState, Position, Piece, MoveValidationResult } from './GameTypes';
 
 // 棋子走法验证规则
 
@@ -278,43 +278,88 @@ export const isValidMove = (
   gameState: ChessState,
   from: Position,
   to: Position
-): boolean => {
+): MoveValidationResult => {
   const piece = gameState.board[from.y][from.x];
 
-  if (!piece || piece.color !== gameState.currentTurn) return false; // Piece not found or not the current player's turn
-  if (!isWithinBoard(to)) return false;
-  if (isSamePosition(from, to)) return false;
+  if (!piece) {
+    return { isValid: false, reason: "没有选中任何棋子" };
+  }
+  
+  if (piece.color !== gameState.currentTurn) {
+    return { isValid: false, reason: "现在不是该方走子" };
+  }
+  
+  if (!isWithinBoard(to)) {
+    return { isValid: false, reason: "目标位置超出棋盘范围" };
+  }
+  
+  if (isSamePosition(from, to)) {
+    return { isValid: false, reason: "起始位置和目标位置相同" };
+  }
 
-  // Check if target position has a friendly piece
   const targetPiece = gameState.board[to.y][to.x];
-  if (targetPiece && targetPiece.color === piece.color) return false;
+  if (targetPiece && targetPiece.color === piece.color) {
+    return { isValid: false, reason: "不能吃自己的子" };
+  }
 
-  // Validate moves based on piece type
+  // 验证各种棋子的走法
   switch (piece.type) {
     case '将':
-    case '帅':
-      if (!isValidGeneralMove(piece, from, to)) return false;
-      if (isGeneralsFacing(gameState, from, to)) return false;
-      return !isGeneralInCheck(gameState, to, piece.color);
+    case '帅': {
+      if (!isValidGeneralMove(piece, from, to)) {
+        return { isValid: false, reason: "将/帅只能在九宫格内一步直行" };
+      }
+      if (isGeneralsFacing(gameState, from, to)) {
+        return { isValid: false, reason: "将帅不能面对面" };
+      }
+      if (isGeneralInCheck(gameState, to, piece.color)) {
+        return { isValid: false, reason: "不能送将" };
+      }
+      return { isValid: true };
+    }
     case '士':
-    case '仕':
-      return isValidAdvisorMove(gameState, piece, from, to);
+    case '仕': {
+      if (!isValidAdvisorMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "士/仕只能在九宫格内斜走一格" };
+      }
+      return { isValid: true };
+    }
     case '车':
-    case '車':
-      return isValidChariotMove(gameState, piece, from, to);
+    case '車': {
+      if (!isValidChariotMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "车只能直行，且不能越过其他棋子" };
+      }
+      return { isValid: true };
+    }
     case '马':
-    case '馬':
-      return isValidHorseMove(gameState, piece, from, to);
+    case '馬': {
+      if (!isValidHorseMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "马走日，且不能蹩马腿" };
+      }
+      return { isValid: true };
+    }
     case '兵':
-    case '卒':
-      return isValidSoldierMove(gameState, piece, from, to);
+    case '卒': {
+      if (!isValidSoldierMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "兵/卒只能向前，过河后可横行" };
+      }
+      return { isValid: true };
+    }
     case '炮':
-    case '砲':
-      return isValidCannonMove(gameState, piece, from, to);
+    case '砲': {
+      if (!isValidCannonMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "炮移动时不能越子，吃子时需要一个炮架" };
+      }
+      return { isValid: true };
+    }
     case '相':
-    case '象': 
-      return isValidBishopMove(gameState, piece, from, to);
+    case '象': {
+      if (!isValidBishopMove(gameState, piece, from, to)) {
+        return { isValid: false, reason: "相/象走田字且不能过河，不能塞象眼" };
+      }
+      return { isValid: true };
+    }
     default:
-      return false; // Invalid piece type
+      return { isValid: false, reason: "无效的棋子类型" };
   }
 };

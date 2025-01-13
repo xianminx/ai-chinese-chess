@@ -21,3 +21,8 @@ export interface ChessState {
   gameStatus: GameStatus;
   lastMove: [Position, Position] | null;
 }
+
+export type MoveValidationResult = {
+  isValid: boolean;
+  reason?: string;
+};

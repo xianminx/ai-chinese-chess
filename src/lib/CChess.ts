@@ -84,7 +84,8 @@ export class CChess {
   }
 
   public isValidMove(from: Position, to: Position): boolean {
-    return isValidMove(this.gameState, from, to);
+    const result = isValidMove(this.gameState, from, to);
+    return result.isValid;
   }
 
   public movePiece(from: Position, to: Position): void {
