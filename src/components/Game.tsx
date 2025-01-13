@@ -25,11 +25,17 @@ export default function Game() {
     const handleAskAI = async () => {
         setIsThinking(true);
         try {
-            const { success, aimove, message, debugInfo } = await getAIMove(gameState);
+            const { success, aimove, message, explanation, debugInfo } = await getAIMove(gameState);
             if (aimove && success) {
-                toast.success(message, {
-                    duration: 3000,
-                });
+                const custom = <div className="flex flex-col gap-2">
+                    <div className="text-lg font-bold">{message}</div>
+                    <div className="text-sm text-gray-500">{explanation}</div>
+                </div>
+                toast(custom, { duration: 3000 });
+                     
+                // toast.success(message, {
+                //     duration: 3000,
+                // });
                 const [from, to] = aimove;
                 onMove(from, to);
                 console.log(debugInfo);

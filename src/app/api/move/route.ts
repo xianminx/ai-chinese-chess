@@ -5,7 +5,7 @@ import { ChessAI } from "./chessAI";
 export async function POST(request: Request) {
     try {
         const chessState: ChessState = await request.json();
-        console.log('chessState', chessState);
+        // console.log('chessState', chessState);
 
         const ai = new ChessAI();
         const result = await ai.getMove(chessState);

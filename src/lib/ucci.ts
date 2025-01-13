@@ -30,7 +30,7 @@ export function parseMove(move: string): [Position, Position] | null {
         file.charCodeAt(0) - "a".charCodeAt(0);
 
     // Convert ranks ('1' to '10') to 0-9
-    const rankToNumber = (rank: string): number => 10 - parseInt(rank); // Convert rank to zero-based index
+    const rankToNumber = (rank: string): number => parseInt(rank) - 1; // Convert rank to zero-based index
 
     // Create Position objects for both from and to
     const from: Position = {
