@@ -286,7 +286,7 @@ export const isValidMove = (
   }
   
   if (piece.color !== gameState.currentTurn) {
-    return { isValid: false, reason: "现在不是该方走子" };
+    return { isValid: false, reason: "现在是" + (gameState.currentTurn === "red" ? "红" : "黑") + "方走子" };
   }
   
   if (!isWithinBoard(to)) {

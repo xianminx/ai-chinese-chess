@@ -1,3 +1,4 @@
+import { json } from "stream/consumers";
 import { ChessState, Position } from "./GameTypes";
 import { isValidMove } from "./moveValidation";
 import { parseMove } from "./ucci";
@@ -26,11 +27,20 @@ export async function getAIMove(chessState: ChessState): Promise<{
     const { success, move } = data;
     if (success) {
       const [from, to] = parseMove(move) as [Position, Position];
-      if (!from || !to || !isValidMove(chessState, from, to)) {
+      if (!from || !to) {
         return {
           ...data,
           success: false,
-          message: "AI返回的移动格式无效",
+          message: "AI返回的移动格式无效: " + move,
+        };
+      }
+      const moveResult = isValidMove(chessState, from, to);
+      
+      if (!moveResult.isValid) {
+        return {
+          ...data,
+          success: false,
+          message: "AI返回的移动格式无效: " + move + " " + moveResult.reason,
         };
       }
 
