@@ -19,48 +19,48 @@ function initializeBoard(): (Piece | null)[][] {
 
   // Initialize the board with pieces
   // Black pieces (top)
-  board[0][0] = LEGAL_PIECES["R"];
-  board[0][1] = LEGAL_PIECES["N"];
-  board[0][2] = LEGAL_PIECES["B"];
-  board[0][3] = LEGAL_PIECES["A"];
-  board[0][4] = LEGAL_PIECES["K"];
-  board[0][5] = LEGAL_PIECES["A"];
-  board[0][6] = LEGAL_PIECES["B"];
-  board[0][7] = LEGAL_PIECES["N"];
-  board[0][8] = LEGAL_PIECES["R"];
+  board[0][0] = LEGAL_PIECES["r"];
+  board[0][1] = LEGAL_PIECES["n"];
+  board[0][2] = LEGAL_PIECES["b"];
+  board[0][3] = LEGAL_PIECES["a"];
+  board[0][4] = LEGAL_PIECES["k"];
+  board[0][5] = LEGAL_PIECES["a"];
+  board[0][6] = LEGAL_PIECES["b"];
+  board[0][7] = LEGAL_PIECES["n"];
+  board[0][8] = LEGAL_PIECES["r"];
 
   // Black cannons
-  board[2][1] = LEGAL_PIECES["C"];
-  board[2][7] = LEGAL_PIECES["C"];
+  board[2][1] = LEGAL_PIECES["c"];
+  board[2][7] = LEGAL_PIECES["c"];
 
   // Black pawns
-  board[3][0] = LEGAL_PIECES["P"];
-  board[3][2] = LEGAL_PIECES["P"];
-  board[3][4] = LEGAL_PIECES["P"];
-  board[3][6] = LEGAL_PIECES["P"];
-  board[3][8] = LEGAL_PIECES["P"];
+  board[3][0] = LEGAL_PIECES["p"];
+  board[3][2] = LEGAL_PIECES["p"];
+  board[3][4] = LEGAL_PIECES["p"];
+  board[3][6] = LEGAL_PIECES["p"];
+  board[3][8] = LEGAL_PIECES["p"];
 
   // Red pawns
-  board[6][0] = LEGAL_PIECES["p"];
-  board[6][2] = LEGAL_PIECES["p"];
-  board[6][4] = LEGAL_PIECES["p"];
-  board[6][6] = LEGAL_PIECES["p"];
-  board[6][8] = LEGAL_PIECES["p"];
+  board[6][0] = LEGAL_PIECES["P"];
+  board[6][2] = LEGAL_PIECES["P"];
+  board[6][4] = LEGAL_PIECES["P"];
+  board[6][6] = LEGAL_PIECES["P"];
+  board[6][8] = LEGAL_PIECES["P"];
 
   // Red cannons
-  board[7][1] = LEGAL_PIECES["c"];
-  board[7][7] = LEGAL_PIECES["c"];
+  board[7][1] = LEGAL_PIECES["C"];
+  board[7][7] = LEGAL_PIECES["C"];
 
   // Red pieces (bottom)
-  board[9][0] = LEGAL_PIECES["r"];
-  board[9][1] = LEGAL_PIECES["n"];
-  board[9][2] = LEGAL_PIECES["b"];
-  board[9][3] = LEGAL_PIECES["a"];
-  board[9][4] = LEGAL_PIECES["k"];
-  board[9][5] = LEGAL_PIECES["a"];
-  board[9][6] = LEGAL_PIECES["b"];
-  board[9][7] = LEGAL_PIECES["n"];
-  board[9][8] = LEGAL_PIECES["r"];
+  board[9][0] = LEGAL_PIECES["R"];
+  board[9][1] = LEGAL_PIECES["N"];
+  board[9][2] = LEGAL_PIECES["B"];
+  board[9][3] = LEGAL_PIECES["A"];
+  board[9][4] = LEGAL_PIECES["K"];
+  board[9][5] = LEGAL_PIECES["A"];
+  board[9][6] = LEGAL_PIECES["B"];
+  board[9][7] = LEGAL_PIECES["N"];
+  board[9][8] = LEGAL_PIECES["R"];
 
   return board;
 }
