@@ -13,7 +13,7 @@ export default function Game() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const playStartSound = useAudio("/audio/start.mp3");
-
+  const playMoveSound = useAudio("/audio/click.wav");
   const handleReset = () => {
     setShowConfirm(true);
   };
@@ -90,6 +90,7 @@ export default function Game() {
         );
         const [from, to] = aimove;
         onMove(from, to);
+        playMoveSound();
         console.log(debugInfo);
       } else {
         console.log("AI返回的移动格式无效", debugInfo);
