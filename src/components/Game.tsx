@@ -2,12 +2,11 @@
 import Chessboard from "./Chessboard";
 import { useCChessState } from "../hooks/useGameState";
 import { toast } from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getAIMoveWithRetry } from "../lib/askAi";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
-import ChatComponent from "./ChatComponent";
-
+import ChatComponent from "./chat/ChatComponent";
 export default function Game() {
   const { gameState, onMove, onSelect, onReset } = useCChessState();
   const [showConfirm, setShowConfirm] = useState(false);

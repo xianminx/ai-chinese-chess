@@ -1,4 +1,3 @@
-import { ChessState } from "@/lib/GameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import { getSystemPrompt, getGameStatePrompt } from "../move/prompts";
 import OpenAI from "openai";

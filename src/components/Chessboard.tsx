@@ -30,7 +30,7 @@ export default function Chessboard({
     });
     const [board, setBoard] = useState(gameState.board);
 
-  const playEndSound = useAudio("/audio/end.mp3");
+//   const playEndSound = useAudio("/audio/end.mp3");
   const [checkBgColor, setCheckBgColor] = useState('#F4D6A0');
 
   useEffect(() => {
