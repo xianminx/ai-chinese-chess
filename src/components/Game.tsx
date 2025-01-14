@@ -163,6 +163,7 @@ export default function Game() {
             onMove={onMove}
             onSelect={onSelect}
             onError={(message) => toast.error(message, { duration: 3000 })}
+            showCoordinates={true}
           />
         </div>
       </div>
