@@ -18,7 +18,7 @@ interface ChessboardProps {
 }
 
 const X_AXIS_LABELS = ["a", "b", "c", "d", "e", "f", "g", "h", "i"];
-const Y_AXIS_LABELS = ["10", "9", "8", "7", "6", "5", "4", "3", "2", "1"];
+const Y_AXIS_LABELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export default function Chessboard({
   gameState,
