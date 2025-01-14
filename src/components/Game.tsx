@@ -111,7 +111,7 @@ export default function Game() {
 
   return (
     <div 
-      className={`w-full min-h-screen flex items-center justify-center pt-8
+      className={`w-full min-h-screen flex justify-center pt-8
         transition-colors duration-500`}
     >
       <div className="w-full max-w-4xl flex flex-col items-center gap-6">
