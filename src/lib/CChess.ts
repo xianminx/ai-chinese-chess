@@ -1,6 +1,8 @@
 import { getPieceColor, PlayerColor, type ChessState, type Piece, type Position } from './GameTypes';
 import { isValidMove } from '@/lib/moveValidation';
 import { char2piece, piece2char } from './util';
+import { clearChessState, loadChessState, saveChessState } from './storage';
+import { isBrowser } from './browserUtils';
 
 function initGame(): ChessState {
   return {
@@ -68,8 +70,21 @@ function initializeBoard(): (Piece | null)[][] {
 export class CChess {
   private gameState: ChessState;
 
-  constructor(initialState?: ChessState) {
-    this.gameState = initialState || initGame();
+  constructor() {
+    // Initialize with a new game state by default
+    this.gameState = initGame();
+    
+    // Try to load saved state in browser environment
+    if (isBrowser()) {
+      const savedState = loadChessState();
+      if (savedState) {
+        this.gameState = savedState;
+      }
+    }
+  }
+
+  public setGameState(state: ChessState): void {
+    this.gameState = state;
   }
 
   public getGameState(): ChessState {
@@ -80,7 +95,9 @@ export class CChess {
   }
 
   public selectPiece(position: Position | null): void {
+    console.log("selectPiece", position);
     this.gameState.selectedPosition = position;
+    saveChessState(this.gameState);
   }
 
   public isValidMove(from: Position, to: Position): boolean {
@@ -108,9 +125,11 @@ export class CChess {
       currentTurn: nextTurn,
       gameStatus: isCheck ? 'check' : 'active',
     };
+    saveChessState(this.gameState);
   }
 
   public reset(): void {
+    clearChessState();
     this.gameState = initGame();
   }
 
