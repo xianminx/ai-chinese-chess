@@ -14,9 +14,13 @@ import {
   Button,
   ScrollShadow,
 } from "@nextui-org/react";
-import { IoSettingsOutline, IoCloseOutline } from "react-icons/io5";
+import {
+  IoSettingsOutline,
+  IoCloseOutline,
+  IoSunnyOutline,
+  IoMoonOutline,
+} from "react-icons/io5";
 import { useTheme } from "next-themes";
-import { SunIcon, MoonIcon } from "@nextui-org/shared-icons";
 import ChessPiece from "./ChessPiece";
 
 const MODEL_OPTIONS = [
@@ -146,8 +150,8 @@ export default function Settings() {
                       }
                       size="lg"
                       color="primary"
-                      startContent={<SunIcon />}
-                      endContent={<MoonIcon />}
+                      startContent={<IoMoonOutline />}
+                      endContent={<IoSunnyOutline />}
                       classNames={{
                         wrapper: "group-data-[selected=true]:bg-primary",
                       }}

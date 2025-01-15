@@ -127,7 +127,7 @@ export default function Game() {
                             {gameState.currentTurn === "red" ? (
                                 <span className="text-red-400 font-bold text-lg">红方</span>
                             ) : (
-                                <span className="text-black font-bold text-lg">黑方</span>
+                                <span className="text-black-400 dark:text-gray-400 font-bold text-lg">黑方</span>
                             )}
                         </div>
                         <div className="flex gap-4">
