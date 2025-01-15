@@ -12,16 +12,7 @@ const config: Config = {
   theme: {
     extend: {},
   },
-  plugins: [nextui({
-    themes: {
-      light: {
-        // your light theme
-      },
-      dark: {
-        // your dark theme
-      }
-    }
-  })],
+  plugins: [nextui()],
 };
 
 export default config;
