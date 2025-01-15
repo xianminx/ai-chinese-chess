@@ -1,4 +1,4 @@
-import { Piece } from "../lib/GameTypes";
+import { Piece, ShowType } from "../lib/GameTypes";
 import ChessPiece from "./ChessPiece";
 
 interface CellProps {
@@ -6,9 +6,10 @@ interface CellProps {
   isSelected: boolean;
   onClick: () => void;
   style?: React.CSSProperties;
+  showType?: ShowType;
 }
 
-export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
+export default function Cell({ piece, isSelected, onClick, style, showType }: CellProps) {
   const handleClick = () => {
     onClick();
   };
@@ -28,7 +29,7 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
       onClick={handleClick}
     >
       {piece && (
-        <ChessPiece className="w-[85%] h-[85%]" piece={piece} showType="Icon" />
+        <ChessPiece className="w-[85%] h-[85%]" piece={piece} showType={showType || "Character"} />
       )}
     </div>
   );

@@ -20,7 +20,7 @@ interface ChessPieceProps {
 
 export default function ChessPiece({
   piece,
-  showType,
+  showType = "Character",
   className,
 }: ChessPieceProps) {
   //  the image contains 4 states,

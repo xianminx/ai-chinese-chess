@@ -8,6 +8,7 @@ import { useAudio } from "@/hooks/useAudio.tsx";
 import { motion } from "motion/react";
 import { isValidMove } from "../lib/moveValidation";
 import toast from "react-hot-toast";
+import { useSettings } from "./providers/SettingsProvider";
 
 interface ChessboardProps {
   gameState: ChessState;
@@ -37,6 +38,8 @@ export default function Chessboard({
 
   //   const playEndSound = useAudio("/audio/end.mp3");
   const [checkBgColor, setCheckBgColor] = useState("#F4D6A0");
+  const { settings } = useSettings();
+  const showType = settings.useIcons ? "Icon" : "Character";
 
   useEffect(() => {
     if (gameState.gameStatus === "check") {
@@ -152,6 +155,7 @@ export default function Chessboard({
         }}
         isSelected={isSelected}
         onClick={() => handleCellClick(position)}
+        showType={showType}
       />
     );
 
