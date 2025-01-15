@@ -1,4 +1,4 @@
-import { ChessState, Position, Piece, MoveValidationResult } from "./GameTypes";
+import { ChessState, Position, MoveValidationResult, Piece, isRed, isBlack, getPieceColor } from "./GameTypes";
 
 // 棋子走法验证规则
 
@@ -30,7 +30,7 @@ const isValidGeneralMove = (
   from: Position,
   to: Position
 ): boolean => {
-  if (!isInPalace(to, piece.color)) return false;
+  if (!isInPalace(to, getPieceColor(piece))) return false;
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
   return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
@@ -49,7 +49,7 @@ const isValidAdvisorMove = (
   to: Position
 ): boolean => {
   // Must stay in palace
-  if (!isInPalace(to, piece.color)) return false;
+  if (!isInPalace(to, getPieceColor(piece))) return false;
 
   // Must move diagonally one step
   const dx = Math.abs(to.x - from.x);
@@ -58,7 +58,7 @@ const isValidAdvisorMove = (
 
   // Check target position
   const targetPiece = gameState.board[to.y][to.x];
-  if (targetPiece && targetPiece.color === piece.color) {
+  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece)) {
     return false; // Cannot capture own piece
   }
 
@@ -134,14 +134,14 @@ const isValidSoldierMove = (
   const dy = to.y - from.y; // Not using abs() to check direction
 
   // Red moves up (-1), Black moves down (+1)
-  const forwardDirection = piece.color === "red" ? -1 : 1;
+  const forwardDirection = isRed(piece) ? -1 : 1;
 
   // Check if crossed river (红子过河线是4，黑子过河线是5)
-  const hasCrossedRiver = piece.color === "red" ? from.y <= 4 : from.y >= 5;
+  const hasCrossedRiver = isRed(piece) ? from.y <= 4 : from.y >= 5;
 
   // Target position check
   const targetPiece = gameState.board[to.y][to.x];
-  if (targetPiece && targetPiece.color === piece.color) {
+  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece)) {
     return false; // Cannot capture own piece
   }
 
@@ -198,7 +198,7 @@ const isValidCannonMove = (
 
   if (targetPiece) {
     // If capturing, must jump exactly one piece
-    if (!foundPiece || targetPiece.color === piece.color) {
+    if (!foundPiece || getPieceColor(targetPiece) === getPieceColor(piece)) {
       return false;
     }
     return true;
@@ -213,7 +213,7 @@ const isValidCannonMove = (
 // 1. 走"田"字，即斜着走两格
 // 2. 不能过河
 // 3. 不能塞象眼（象眼位置不能有棋子）
-const isValidBishopMove = (
+const isValidElephantMove = (
   gameState: ChessState,
   piece: Piece,
   from: Position,
@@ -226,8 +226,8 @@ const isValidBishopMove = (
   if (dx !== 2 || dy !== 2) return false;
 
   // Cannot cross the river
-  if (piece.color === "red" && to.y < 5) return false;
-  if (piece.color === "black" && to.y > 4) return false;
+  if (isRed(piece) && to.y < 5) return false;
+  if (isBlack(piece) && to.y > 4) return false;
 
   // Check if the "elephant eye" (middle point) is blocked
   const midX = (from.x + to.x) / 2;
@@ -248,7 +248,7 @@ const isGeneralInCheck = (
   for (let y = 0; y < gameState.board.length; y++) {
     for (let x = 0; x < gameState.board[y].length; x++) {
       const piece = gameState.board[y][x];
-      if (piece && piece.color !== color) {
+      if (piece && getPieceColor(piece) !== color) {
         if (isValidMove(gameState, { x, y }, generalPosition)) {
           return true; // The general is in check
         }
@@ -275,9 +275,9 @@ const isGeneralsFacing = (
     for (let x = 0; x < gameState.board[y].length; x++) {
       const piece = gameState.board[y][x];
       if (piece) {
-        if (piece.char === 'K') {
+        if (piece === 'K') {
           redGeneral = { x, y };
-        } else if (piece.char === 'k') {
+        } else if (piece === 'k') {
           blackGeneral = { x, y };
         }
       }
@@ -286,9 +286,9 @@ const isGeneralsFacing = (
 
   // Update position if we're moving a general
   const movingPiece = gameState.board[from.y][from.x];
-  if (movingPiece?.char === 'K') {
+  if (movingPiece === 'K') {
     redGeneral = to;
-  } else if (movingPiece?.char === 'k') {
+  } else if (movingPiece === 'k') {
     blackGeneral = to;
   }
 
@@ -327,7 +327,7 @@ export const isValidMove = (
     return { isValid: false, reason: "没有选中任何棋子" };
   }
 
-  if (piece.color !== gameState.currentTurn) {
+  if (getPieceColor(piece) !== gameState.currentTurn) {
     return {
       isValid: false,
       reason:
@@ -344,12 +344,12 @@ export const isValidMove = (
   }
 
   const targetPiece = gameState.board[to.y][to.x];
-  if (targetPiece && targetPiece.color === piece.color) {
+  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece)) {
     return { isValid: false, reason: "不能吃自己的子" };
   }
 
   // 验证各种棋子的走法
-  switch (piece.char.toUpperCase()) {
+  switch (piece.toUpperCase()) {
     case "K": {
       if (!isValidGeneralMove(piece, from, to)) {
         return { isValid: false, reason: "将/帅只能在九宫格内一步直行" };
@@ -357,7 +357,7 @@ export const isValidMove = (
       if (isGeneralsFacing(gameState, from, to)) {
         return { isValid: false, reason: "将帅不能面对面" };
       }
-      if (isGeneralInCheck(gameState, to, piece.color)) {
+      if (isGeneralInCheck(gameState, to, getPieceColor(piece))) {
         return { isValid: false, reason: "不能送将" };
       }
       return { isValid: true };
@@ -396,7 +396,7 @@ export const isValidMove = (
       return { isValid: true };
     }
     case "E": {
-      if (!isValidBishopMove(gameState, piece, from, to)) {
+      if (!isValidElephantMove(gameState, piece, from, to)) {
         return { isValid: false, reason: "相/象走田字且不能过河，不能塞象眼" };
       }
       return { isValid: true };

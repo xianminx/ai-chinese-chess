@@ -1,6 +1,6 @@
-import type { ChessState, Piece, Position } from './GameTypes';
+import { getPieceColor, PlayerColor, type ChessState, type Piece, type Position } from './GameTypes';
 import { isValidMove } from '@/lib/moveValidation';
-import { char2piece, LEGAL_PIECES, piece2char } from './util';
+import { char2piece, piece2char } from './util';
 
 function initGame(): ChessState {
   return {
@@ -19,48 +19,48 @@ function initializeBoard(): (Piece | null)[][] {
 
   // Initialize the board with pieces
   // Black pieces (top)
-  board[0][0] = LEGAL_PIECES["r"];
-  board[0][1] = LEGAL_PIECES["h"];
-  board[0][2] = LEGAL_PIECES["e"];
-  board[0][3] = LEGAL_PIECES["a"];
-  board[0][4] = LEGAL_PIECES["k"];
-  board[0][5] = LEGAL_PIECES["a"];
-  board[0][6] = LEGAL_PIECES["e"];
-  board[0][7] = LEGAL_PIECES["h"];
-  board[0][8] = LEGAL_PIECES["r"];
+  board[0][0] = "r";
+  board[0][1] = "h";
+  board[0][2] = "e";
+  board[0][3] = "a";
+  board[0][4] = "k";
+  board[0][5] = "a";
+  board[0][6] = "e";
+  board[0][7] = "h";
+  board[0][8] = "r";
 
   // Black cannons
-  board[2][1] = LEGAL_PIECES["c"];
-  board[2][7] = LEGAL_PIECES["c"];
+  board[2][1] = "c";
+  board[2][7] = "c";
 
   // Black pawns
-  board[3][0] = LEGAL_PIECES["p"];
-  board[3][2] = LEGAL_PIECES["p"];
-  board[3][4] = LEGAL_PIECES["p"];
-  board[3][6] = LEGAL_PIECES["p"];
-  board[3][8] = LEGAL_PIECES["p"];
+  board[3][0] = "p";
+  board[3][2] = "p";
+  board[3][4] = "p";
+  board[3][6] = "p";
+  board[3][8] = "p";
 
   // Red pawns
-  board[6][0] = LEGAL_PIECES["P"];
-  board[6][2] = LEGAL_PIECES["P"];
-  board[6][4] = LEGAL_PIECES["P"];
-  board[6][6] = LEGAL_PIECES["P"];
-  board[6][8] = LEGAL_PIECES["P"];
+  board[6][0] = "P";
+  board[6][2] = "P";
+  board[6][4] = "P";
+  board[6][6] = "P";
+  board[6][8] = "P";
 
   // Red cannons
-  board[7][1] = LEGAL_PIECES["C"];
-  board[7][7] = LEGAL_PIECES["C"];
+  board[7][1] = "C";
+  board[7][7] = "C";
 
   // Red pieces (bottom)
-  board[9][0] = LEGAL_PIECES["R"];
-  board[9][1] = LEGAL_PIECES["H"];
-  board[9][2] = LEGAL_PIECES["E"];
-  board[9][3] = LEGAL_PIECES["A"];
-  board[9][4] = LEGAL_PIECES["K"];
-  board[9][5] = LEGAL_PIECES["A"];
-  board[9][6] = LEGAL_PIECES["E"];
-  board[9][7] = LEGAL_PIECES["H"];
-  board[9][8] = LEGAL_PIECES["R"];
+  board[9][0] = "R";
+  board[9][1] = "H";
+  board[9][2] = "E";
+  board[9][3] = "A";
+  board[9][4] = "K";
+  board[9][5] = "A";
+  board[9][6] = "E";
+  board[9][7] = "H";
+  board[9][8] = "R";
 
   return board;
 }
@@ -166,14 +166,14 @@ export class CChess {
     };
   }
 
-  private isKingInCheck(board: (Piece | null)[][], kingColor: 'red' | 'black'): boolean {
+  private isKingInCheck(board: (Piece | null)[][], kingColor: PlayerColor): boolean {
     // First find the king's position
     let kingPos: Position | null = null;
     const kingPiece = kingColor === 'red' ? 'K' : 'k';
     
     for (let y = 0; y < board.length; y++) {
       for (let x = 0; x < board[y].length; x++) {
-        if (board[y][x]?.char === kingPiece) {
+        if (board[y][x] === kingPiece) {
           kingPos = { x, y };
           break;
         }
@@ -187,7 +187,7 @@ export class CChess {
     for (let y = 0; y < board.length; y++) {
       for (let x = 0; x < board[y].length; x++) {
         const piece = board[y][x];
-        if (piece && piece.color !== kingColor) {
+        if (piece && getPieceColor(piece) !== kingColor) {
           const from: Position = { x, y };
           const result = isValidMove(
             { ...this.gameState, board },

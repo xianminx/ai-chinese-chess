@@ -1,4 +1,4 @@
-import { ChessState, Position } from "./GameTypes";
+import { ChessState, getPieceCharacter, isRed, Position } from "./GameTypes";
 import { isValidMove } from "./moveValidation";
 import { parseMove } from "./ucci";
 
@@ -85,7 +85,7 @@ export async function getAIMove(chessState: ChessState): Promise<{
           message: "起始位置没有棋子",
         };
       }
-      const pieceStr = `${piece?.color === "red" ? "红" : "黑"}${piece?.type}`;
+      const pieceStr = `${isRed(piece) ? "红" : "黑"}  ${getPieceCharacter(piece)}`;
       const message = `AI建议移动: ${move} | ${pieceStr} ${from.x},${from.y} -> ${to.x},${to.y} `;
       console.log(message);
 

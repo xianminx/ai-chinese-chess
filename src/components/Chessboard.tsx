@@ -1,5 +1,5 @@
 "use client";
-import { Position, ChessState, Piece } from "../lib/GameTypes";
+import { Position, ChessState, getPieceColor, Piece } from "../lib/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
 import { useEffect, useState } from "react";
@@ -94,7 +94,7 @@ export default function Chessboard({
 
     if (selectedPosition) {
       // 如果已经选择了棋子，则进行移动或者重新选择棋子
-      if (pieceAtPosition && currentTurn === pieceAtPosition.color) {
+      if (pieceAtPosition && currentTurn === getPieceColor(pieceAtPosition)) {
         // 如果选择的是自己的棋子，则重新选择棋子
         playSelectSound();
         onSelect(position);
@@ -113,7 +113,7 @@ export default function Chessboard({
       }
     } else if (pieceAtPosition) {
       // 如果未选择棋子，则选择棋子
-      if (currentTurn === pieceAtPosition.color) {
+      if (currentTurn === getPieceColor(pieceAtPosition)) {
         playSelectSound();
         onSelect(position);
       } else {

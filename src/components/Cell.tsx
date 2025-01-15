@@ -2,25 +2,20 @@ import { Piece } from "../lib/GameTypes";
 import ChessPiece from "./ChessPiece";
 
 interface CellProps {
-    piece: Piece | null;
-    isSelected: boolean;
-    onClick: () => void;
-    style?: React.CSSProperties;
+  piece: Piece | null;
+  isSelected: boolean;
+  onClick: () => void;
+  style?: React.CSSProperties;
 }
 
 export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
+  const handleClick = () => {
+    onClick();
+  };
 
-    const handleClick = () => {
-        onClick();
-    };
-
-    const fontSize = style?.width
-        ? `${parseInt(style.width as string) * 0.6}px`
-        : "inherit";
-
-    return (
-        <div
-            className={`
+  return (
+    <div
+      className={`
         absolute -translate-x-1/2 -translate-y-1/2
         rounded-full
         flex items-center justify-center
@@ -29,12 +24,12 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
         ${isSelected ? "ring-2 ring-yellow-400 bg-yellow-200" : ""}
         hover:brightness-95
       `}
-            style={style}
-            onClick={handleClick}
-        >
-            {piece && (
-                <ChessPiece className="w-[85%] h-[85%]" char={piece.char} showType="Icon" />
-            )}
-        </div>
-    );
+      style={style}
+      onClick={handleClick}
+    >
+      {piece && (
+        <ChessPiece className="w-[85%] h-[85%]" piece={piece} showType="Icon" />
+      )}
+    </div>
+  );
 }

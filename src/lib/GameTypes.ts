@@ -8,18 +8,26 @@ export type GameStatus = 'active' | 'check' | 'checkmate' | 'stalemate' | 'draw'
 // A: Advisor, 士/仕
 // C: Cannon, 炮/砲
 // P: Pawn, 卒/兵
-export type PieceType = '帅' | '将' |'車' | '车' | '馬' | '马' | '象' | '相' | '士' | '仕' | '卒' | '兵' | '炮' | '砲' ;
-export type PieceChar = 'K' | 'R' | 'H' | 'E' | 'A' | 'C' | 'P' | 'k' | 'r' | 'h' | 'e' | 'a' | 'c' | 'p';
+export type PieceCharacter = '帅' | '将' |'車' | '车' | '馬' | '马' | '象' | '相' | '士' | '仕' | '卒' | '兵' | '炮' | '砲' ;
+export type Piece = 'K' | 'R' | 'H' | 'E' | 'A' | 'C' | 'P' | 'k' | 'r' | 'h' | 'e' | 'a' | 'c' | 'p';
 export interface Position {
   x: number;
   y: number;
 }
 
-export function isRed(char: PieceChar) {
+export function isRed(char: Piece) {
   return char.toUpperCase() === char;
 }
 
-export function getPieceCharacter(char: PieceChar): PieceType {
+export function isBlack(char: Piece) {
+  return char.toLowerCase() === char;
+}
+
+export function getPieceColor(char: Piece) {
+  return isRed(char) ? "red" : "black";
+}
+
+export function getPieceCharacter(char: Piece): PieceCharacter {
   switch(char) {
     case 'k':
       return '帅';
@@ -52,12 +60,6 @@ export function getPieceCharacter(char: PieceChar): PieceType {
   }
 }
 
-export interface Piece {
-  type: PieceType;
-  color: PlayerColor;
-  char: PieceChar;
-}
-
 export interface ChessState {
   // 9x10 board for Chinese Chess, null represents empty cell
   board: (Piece | null)[][];
@@ -71,3 +73,4 @@ export type MoveValidationResult = {
   isValid: boolean;
   reason?: string;
 };
+export type ShowType = "Character" | "Icon";
