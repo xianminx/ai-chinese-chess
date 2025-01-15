@@ -41,10 +41,8 @@ export default function Chessboard({
   useEffect(() => {
     if (gameState.gameStatus === "check") {
       toast.error(
-        `${gameState.currentTurn === "red" ? "红帅" : "黑将"}被将军！`,
+        `${gameState.currentTurn === "red" ? "红方" : "黑方"}被将军！`,
         {
-          duration: 2000,
-          position: "top-center",
           icon: "⚠️",
         }
       );
@@ -213,7 +211,7 @@ export default function Chessboard({
               }}
             >
               {Y_AXIS_LABELS.map((label) => (
-                <span key={label} className="text-sm text-gray-600 leading-none bg-[#F4D6A0] rounded">
+                <span key={label} className="text-sm text-gray-600 leading-none">
                   {label}
                 </span>
               ))}
@@ -229,7 +227,7 @@ export default function Chessboard({
               }}
             >
               {X_AXIS_LABELS.map((label) => (
-                <span key={label} className="text-sm text-gray-600 bg-[#F4D6A0] rounded">
+                <span key={label} className="text-sm text-gray-600">
                   {label}
                 </span>
               ))}

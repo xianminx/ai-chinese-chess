@@ -20,13 +20,13 @@ function initializeBoard(): (Piece | null)[][] {
   // Initialize the board with pieces
   // Black pieces (top)
   board[0][0] = LEGAL_PIECES["r"];
-  board[0][1] = LEGAL_PIECES["n"];
-  board[0][2] = LEGAL_PIECES["b"];
+  board[0][1] = LEGAL_PIECES["h"];
+  board[0][2] = LEGAL_PIECES["e"];
   board[0][3] = LEGAL_PIECES["a"];
   board[0][4] = LEGAL_PIECES["k"];
   board[0][5] = LEGAL_PIECES["a"];
-  board[0][6] = LEGAL_PIECES["b"];
-  board[0][7] = LEGAL_PIECES["n"];
+  board[0][6] = LEGAL_PIECES["e"];
+  board[0][7] = LEGAL_PIECES["h"];
   board[0][8] = LEGAL_PIECES["r"];
 
   // Black cannons
@@ -53,13 +53,13 @@ function initializeBoard(): (Piece | null)[][] {
 
   // Red pieces (bottom)
   board[9][0] = LEGAL_PIECES["R"];
-  board[9][1] = LEGAL_PIECES["N"];
-  board[9][2] = LEGAL_PIECES["B"];
+  board[9][1] = LEGAL_PIECES["H"];
+  board[9][2] = LEGAL_PIECES["E"];
   board[9][3] = LEGAL_PIECES["A"];
   board[9][4] = LEGAL_PIECES["K"];
   board[9][5] = LEGAL_PIECES["A"];
-  board[9][6] = LEGAL_PIECES["B"];
-  board[9][7] = LEGAL_PIECES["N"];
+  board[9][6] = LEGAL_PIECES["E"];
+  board[9][7] = LEGAL_PIECES["H"];
   board[9][8] = LEGAL_PIECES["R"];
 
   return board;

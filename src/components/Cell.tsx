@@ -1,4 +1,5 @@
 import { Piece } from "../lib/GameTypes";
+import ChessPiece from "./ChessPiece";
 
 interface CellProps {
     piece: Piece | null;
@@ -25,7 +26,6 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
         flex items-center justify-center
         cursor-pointer 
         transition-all duration-200
-        ${piece ? "bg-gray-100 ring-2 ring-inset ring-gray-300" : ""}
         ${isSelected ? "ring-2 ring-yellow-400 bg-yellow-200" : ""}
         hover:brightness-95
       `}
@@ -33,16 +33,7 @@ export default function Cell({ piece, isSelected, onClick, style }: CellProps) {
             onClick={handleClick}
         >
             {piece && (
-                <span
-                    className={`
-          w-[85%] h-[85%] flex items-center justify-center
-          text-[60%] leading-none rounded-full ring-1 ring-inset ring-gray-800
-          ${piece.color === "red" ? "text-red-600" : "text-black"}
-        `}
-                    style={{ fontSize: fontSize }}
-                >
-                    {piece.type}
-                </span>
+                <ChessPiece className="w-[85%] h-[85%]" char={piece.char} showType="Icon" />
             )}
         </div>
     );
