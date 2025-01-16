@@ -7,6 +7,7 @@ import { getAIMoveWithRetry } from "../lib/askAi";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
 import ChatComponent from "./chat/ChatComponent";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function Game() {
     const { gameState, onMove, onSelect, onReset } = useCChessState();
@@ -14,6 +15,7 @@ export default function Game() {
     const [isThinking, setIsThinking] = useState(false);
     const playStartSound = useAudio("/audio/start.mp3");
     const playMoveSound = useAudio("/audio/click.wav");
+    const { t, mounted: languageMounted } = useLanguage();
 
     const handleReset = () => {
         setShowConfirm(true);
@@ -110,29 +112,39 @@ export default function Game() {
         }
     };
 
+    if (!languageMounted) {
+        return null;
+    }
+
     return (
         <div 
             className={`w-full min-h-screen flex justify-center pt-8
                 transition-colors duration-500`}
         >
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">
-                    <div className="flex items-center gap-2">
+                <div className="flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">
+                    <div className="flex justify-center items-center gap-2 pb-4">
                         <Image src="/icon.svg" alt="icon" width={40} height={40} />
-                        <h1 className="text-2xl font-bold text-gray-800">中国象棋</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            {t("game.title")}
+                        </h1>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
                         <div className="text-lg text-gray-600">
-                            当前:{" "}
+                            {t("game.currentTurn")}:{" "}
                             {gameState.currentTurn === "red" ? (
-                                <span className="text-red-400 font-bold text-lg">红方</span>
+                                <span className="text-red-400 font-bold text-lg">
+                                    {t("game.red")}
+                                </span>
                             ) : (
-                                <span className="text-black-400 dark:text-gray-400 font-bold text-lg">黑方</span>
+                                <span className="text-black-400 dark:text-gray-400 font-bold text-lg">
+                                    {t("game.black")}
+                                </span>
                             )}
                         </div>
                         <div className="flex gap-4">
                             <button
-                                className="w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
+                                className="min-w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
                                                ring-offset-white transition-colors focus-visible:outline-none 
                                                focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
                                                disabled:pointer-events-none disabled:opacity-50
@@ -141,10 +153,10 @@ export default function Game() {
                                 onClick={handleAskAI}
                                 disabled={isThinking}
                             >
-                                {isThinking ? "思考中..." : "询问AI"}
+                                {isThinking ? t("game.thinking") : t("game.askAI")}
                             </button>
                             <button
-                                className="w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
+                                className="min-w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
                                                ring-offset-white transition-colors focus-visible:outline-none 
                                                focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 
                                                disabled:pointer-events-none disabled:opacity-50
@@ -152,7 +164,7 @@ export default function Game() {
                                                active:scale-95 h-9 px-4 py-2"
                                 onClick={handleReset}
                             >
-                                重新开局
+                                {t("game.newGame")}
                             </button>
                         </div>
                     </div>
@@ -180,31 +192,31 @@ export default function Game() {
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full mx-4 animate-in fade-in zoom-in duration-200">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            确认重新开局？
+                            {t("game.confirmNewGame.title")}
                         </h3>
                         <p className="text-gray-600 mb-6">
-                            当前对局将会被清除，确定要重新开始吗？
+                            {t("game.confirmNewGame.message")}
                         </p>
                         <div className="flex justify-end gap-3">
                             <button
-                                className="inline-flex items-center justify-center rounded-md text-sm font-medium
+                                className="min-w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
                                                  ring-offset-white transition-colors focus-visible:outline-none 
                                                  focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2
                                                  border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900
                                                  active:scale-95 h-9 px-4 py-2"
                                 onClick={() => setShowConfirm(false)}
                             >
-                                取消
+                                {t("game.confirmNewGame.cancel")}
                             </button>
                             <button
-                                className="inline-flex items-center justify-center rounded-md text-sm font-medium
+                                className="min-w-24 inline-flex items-center justify-center rounded-md text-sm font-medium
                                                  ring-offset-white transition-colors focus-visible:outline-none 
                                                  focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2
                                                  bg-slate-900 text-slate-50 hover:bg-slate-900/90
                                                  active:scale-95 h-9 px-4 py-2"
                                 onClick={confirmReset}
                             >
-                                确认
+                                {t("game.confirmNewGame.confirm")}
                             </button>
                         </div>
                     </div>

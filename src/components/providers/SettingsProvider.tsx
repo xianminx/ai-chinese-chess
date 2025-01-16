@@ -2,15 +2,23 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
+export const MODEL_OPTIONS = [
+    "gpt-3.5-turbo",
+    "gpt-4o-mini",
+    "gpt-4o",
+    "o1-mini",
+    "o1-preview",
+  ];
+   
 export type SettingsType = {
     aiMode: boolean;
-    model: 'gpt-3.5-turbo' | 'gpt-4' | 'claude-3-opus' | 'claude-3-sonnet';
+    model: typeof MODEL_OPTIONS[number];
     useIcons: boolean;
 };
 
 const defaultSettings: SettingsType = {
     aiMode: false,
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4o-mini',
     useIcons: true,
 };
 
@@ -45,4 +53,5 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     );
 }
 
-export const useSettings = () => useContext(SettingsContext); 
+export const useSettings = () => useContext(SettingsContext);
+

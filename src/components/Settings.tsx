@@ -1,6 +1,6 @@
 "use client";
 
-import { useSettings } from "./providers/SettingsProvider";
+import { MODEL_OPTIONS, useSettings } from "./providers/SettingsProvider";
 import type { SettingsType } from "./providers/SettingsProvider";
 import { useState, useEffect } from "react";
 import {
@@ -19,21 +19,18 @@ import {
   IoCloseOutline,
   IoSunnyOutline,
   IoMoonOutline,
+  IoDesktopOutline,
+  IoLanguageOutline,
 } from "react-icons/io5";
 import { useTheme } from "next-themes";
 import ChessPiece from "./ChessPiece";
-
-const MODEL_OPTIONS = [
-  "gpt-3.5-turbo",
-  "gpt-4o-mini",
-  "gpt-4o",
-  "o1-mini",
-  "o1-preview",
-];
+import { useLanguage } from "../i18n/LanguageProvider";
+import { Language, translations } from "../i18n/translations";
 
 export default function Settings() {
   const { settings, setSettings } = useSettings();
   const { theme, setTheme } = useTheme();
+  const { t, language, setLanguage, mounted: languageMounted } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -41,7 +38,7 @@ export default function Settings() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  if (!mounted || !languageMounted) {
     return null;
   }
 
@@ -68,7 +65,7 @@ export default function Settings() {
       >
         <Card className="h-full rounded-none sm:rounded-l-2xl flex flex-col">
           <CardHeader className="flex justify-between items-center px-6 py-4 shrink-0">
-            <h2 className="text-xl font-bold">Game Settings</h2>
+            <h2 className="text-xl font-bold">{t("settings.title")}</h2>
             <Button
               isIconOnly
               variant="light"
@@ -85,12 +82,14 @@ export default function Settings() {
                 {/* AI Settings Group */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-default-600 px-1">
-                    AI Settings
+                    {t("settings.aiSettings.title")}
                   </h3>
 
                   {/* AI Toggle */}
                   <div className="flex justify-between items-center px-1 py-2">
-                    <span className="text-sm font-medium">Play with AI</span>
+                    <span className="text-sm font-medium">
+                      {t("settings.aiSettings.playWithAI")}
+                    </span>
                     <Switch
                       isSelected={settings.aiMode}
                       onValueChange={(checked) =>
@@ -110,7 +109,7 @@ export default function Settings() {
                   {/* AI Model Select */}
                   <div className="space-y-2 px-1">
                     <label className="text-sm font-medium block text-default-700">
-                      AI Model
+                      {t("settings.aiSettings.aiModel")}
                     </label>
                     <Select
                       selectedKeys={[settings.model]}
@@ -137,30 +136,71 @@ export default function Settings() {
                 {/* Display Settings Group */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-default-600 px-1">
-                    Display Settings
+                    {t("settings.displaySettings.title")}
                   </h3>
 
-                  {/* Theme Toggle */}
-                  <div className="flex justify-between items-center px-1 py-2">
-                    <span className="text-sm font-medium">Theme</span>
-                    <Switch
-                      isSelected={theme === "dark"}
-                      onValueChange={(checked) =>
-                        setTheme(checked ? "dark" : "light")
-                      }
-                      size="lg"
-                      color="primary"
-                      startContent={<IoMoonOutline />}
-                      endContent={<IoSunnyOutline />}
-                      classNames={{
-                        wrapper: "group-data-[selected=true]:bg-primary",
-                      }}
-                    />
+                  {/* Language Select */}
+                  <div className="space-y-2 px-1">
+                    <label className="text-sm font-medium block text-default-700">
+                      {t("settings.displaySettings.language")}
+                    </label>
+                    <Select
+                      selectedKeys={[language]}
+                      onChange={(e) => setLanguage(e.target.value as Language)}
+                      className="w-full"
+                      size="sm"
+                      variant="flat"
+                      startContent={<IoLanguageOutline className="text-default-500" />}
+                    >
+                      {Object.keys(translations).map((lang) => (
+                        <SelectItem 
+                          key={lang} 
+                          value={lang}
+                        >
+                          {t(`settings.displaySettings.languages.${lang}`)}
+                        </SelectItem>
+                      ))}
+                    </Select>
                   </div>
 
-                  {/* Icons Toggle */}
+                  {/* Theme Select */}
+                  <div className="space-y-2 px-1">
+                    <label className="text-sm font-medium block text-default-700">
+                      {t("settings.displaySettings.theme")}
+                    </label>
+                    <Select
+                      selectedKeys={[theme ?? 'system']}
+                      onChange={(e) => setTheme(e.target.value)}
+                      className="w-full"
+                      size="sm"
+                      variant="flat"
+                      startContent={
+                        theme === 'dark' ? (
+                          <IoMoonOutline className="text-default-500" />
+                        ) : theme === 'light' ? (
+                          <IoSunnyOutline className="text-default-500" />
+                        ) : (
+                          <IoDesktopOutline className="text-default-500" />
+                        )
+                      }
+                    >
+                      <SelectItem key="light" value="light" startContent={<IoSunnyOutline />}>
+                        {t("settings.displaySettings.themeOptions.light")}
+                      </SelectItem>
+                      <SelectItem key="dark" value="dark" startContent={<IoMoonOutline />}>
+                        {t("settings.displaySettings.themeOptions.dark")}
+                      </SelectItem>
+                      <SelectItem key="system" value="system" startContent={<IoDesktopOutline />}>
+                        {t("settings.displaySettings.themeOptions.system")}
+                      </SelectItem>
+                    </Select>
+                  </div>
+
+                  {/* Piece Style Toggle */}
                   <div className="flex justify-between items-center px-1 py-2">
-                    <span className="text-sm font-medium">Piece Style</span>
+                    <span className="text-sm font-medium">
+                      {t("settings.displaySettings.pieceStyle")}
+                    </span>
                     <Switch
                       isSelected={settings.useIcons}
                       onValueChange={(checked) =>
