@@ -125,7 +125,7 @@ export default function Game() {
                 <div className="flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">
                     <div className="flex justify-center items-center gap-2 pb-4">
                         <Image src="/icon.svg" alt="icon" width={40} height={40} />
-                        <h1 className="text-2xl font-bold text-gray-800">
+                        <h1 className="text-2xl font-bold text-default-900 dark:text-gray-400">
                             {t("game.title")}
                         </h1>
                     </div>
