@@ -51,6 +51,7 @@ export function computeWinner(n: number): boolean {
  * Prints the game results for numbers from 0 to limit
  * @param limit The upper limit of numbers to compute (exclusive)
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function printGameResults(limit: number = 100): void {
     computeWinner(limit - 1); // Ensure all results are computed
     for (let i = 0; i < limit; i++) {
