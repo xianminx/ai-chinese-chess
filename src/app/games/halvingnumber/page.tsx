@@ -97,7 +97,7 @@ export default function HalvingNumberGrid() {
         </div>
 
         {/* Grid section */}
-        <div className="flex justify-center mb-8 overflow-auto mt-8">
+        <div className="flex justify-center mb-8 overflow-auto">
           <Grid rows={rows} cols={cols} cellSize={cellSize} />
         </div>
       </div>

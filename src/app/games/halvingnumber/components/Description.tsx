@@ -6,12 +6,12 @@ export default function Description() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="text-center mb-8">
+    <div className="text-center relative max-w-5xl mx-auto">
       <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">
         Halving Number Game
       </h1>
 
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full  mx-auto">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="group w-full px-6 py-4 flex flex-col items-center gap-3 text-left rounded-xl transition-colors hover:bg-white/30"
@@ -44,11 +44,11 @@ export default function Description() {
         </button>
 
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isExpanded ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+          className={`absolute left-0 right-0 z-10 overflow-hidden transition-all duration-300 ease-in-out${
+            isExpanded ? "max-h-auto opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="px-6 py-4 mt-3 bg-white/30 backdrop-blur-sm rounded-xl">
+          <div className="px-6 py-4 mt-3 bg-white/95 border border-gray-200 backdrop-blur-sm rounded-xl shadow-lg">
             <div className="space-y-6 text-gray-600">
               <section>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">How to Play</h3>
@@ -83,24 +83,28 @@ export default function Description() {
               </section>
 
               <section>
-                <h3 className="text-lg font-medium text-gray-800 mb-2">Strategy</h3>
+                <h3 className="text-lg font-medium text-gray-800 mb-2">Mathematical Pattern</h3>
                 <div className="space-y-2">
-                  <p className="leading-relaxed mb-3">
-                    Each position is either winning or losing. Here's how it works:
-                  </p>
-                  <div className="grid gap-2">
-                    {[
-                      { n: "1", desc: "Losing - any move gives 0" },
-                      { n: "2", desc: "Winning - divide by 2 to reach 1" },
-                      { n: ">2", desc: "Win if you can reach a losing position" }
-                    ].map(({ n, desc }) => (
-                      <div key={n} className="flex items-center gap-3 p-2 bg-white/50 rounded-lg">
-                        <span className="font-mono px-3 py-1 bg-white rounded-md shadow-sm">
-                          {n}
-                        </span>
-                        <span>{desc}</span>
-                      </div>
-                    ))}
+                  <div className="p-4 bg-white/50 rounded-lg text-left">
+                    <p className="text-sm leading-relaxed">
+                      This game is deterministic - for any starting number, we can predict whether 
+                      the first player will win or lose with perfect play. Here's how it works:
+                    </p>
+                    <p className="text-sm leading-relaxed mt-3">
+                      For any position N > 2, you win if either:
+                    </p>
+                    <ul className="list-disc ml-4 mt-2 text-sm space-y-2">
+                      <li>
+                        Dividing by 2 (⌊N/2⌋) leads to a losing position for your opponent
+                      </li>
+                      <li>
+                        Subtracting 1 (N-1) leads to a losing position for your opponent
+                      </li>
+                    </ul>
+                    <p className="text-sm mt-3 text-gray-600">
+                      This creates a predictable pattern of winning and losing positions 
+                      that you can learn to recognize.
+                    </p>
                   </div>
                 </div>
               </section>
