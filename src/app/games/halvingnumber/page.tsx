@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Grid from "./components/Grid";
-import Game from "./components/Game";
+import WinnerTable from "./components/WinnerTable";
+import GamePannel from "./components/GamePannel";
 import Description from "./components/Description";
 
 const MAX_NUMBERS = 3000;
@@ -50,7 +50,7 @@ export default function HalvingNumberGrid() {
         </div>
 
         {/* Game Section */}
-        <Game />
+        <GamePannel />
 
         {/* Visualization Toggle */}
         <div className="text-center mt-12 mb-6">
@@ -123,7 +123,7 @@ export default function HalvingNumberGrid() {
 
             {/* Grid */}
             <div className="flex justify-center mb-8 overflow-auto mt-8">
-              <Grid rows={rows} cols={cols} cellSize={cellSize} />
+              <WinnerTable rows={rows} cols={cols} cellSize={cellSize} />
             </div>
           </>
         )}

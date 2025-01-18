@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from "react";
-import { computeWinner } from "../half_math";
+import { computeWinner } from "../utils/half_math";
 
 interface GridProps {
   rows: number;
@@ -9,7 +9,7 @@ interface GridProps {
   cellSize: number;
 }
 
-export default function Grid({ rows, cols, cellSize }: GridProps) {
+export default function WinnerTable({ rows, cols, cellSize }: GridProps) {
   // Precompute results for visible numbers
   const results = useMemo(() => {
     return Array(rows).fill(0).map((_, row) =>

@@ -2,16 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import confetti from 'canvas-confetti';
+import { Turn, Action, GameState } from "./PolicyEngine";
+import { askForAction } from "./PolicyEngine";
 
-type Player = "human" | "ai";
-type Action = "/" | "-";
-
-interface GameState {
-  value: number;
-  turn: Player;
-  history: { value: number; action?: Action }[];
-  gameOver: boolean;
-}
 
 interface ButtonProps {
   disabled: boolean;
@@ -236,7 +229,7 @@ const NumberInput = ({
   />
 );
 
-export default function Game() {
+export default function GamePannel() {
   const [gameState, setGameState] = useState<GameState>({
     value: 30,
     turn: "human",
@@ -253,9 +246,6 @@ export default function Game() {
           ...prev,
           ...updates,
         };
-        console.log(
-          `updateGameState, prev state: ${JSON.stringify(prev)} \n updates: ${JSON.stringify(updates)} \n new state: ${JSON.stringify(newState)}`
-        );
         return newState;
       });
     },
@@ -282,7 +272,7 @@ export default function Game() {
   useEffect(() => {
     if (gameState.turn === "ai" && !gameState.gameOver) {
       const aiMoveTimeout = setTimeout(() => {
-        const action: Action = Math.random() < 0.5 ? "/" : "-";
+        const action: Action = askForAction(gameState, "minimax");
         const newValue =
           action === "/" ? Math.floor(gameState.value / 2) : gameState.value - 1;
 
@@ -302,11 +292,10 @@ export default function Game() {
     const initialValue = parseInt(startValue) || 30;
     const state = {
         value: initialValue,
-        turn: "human" as Player,
+        turn: "human" as Turn,
         history: [{ value: initialValue }],
       gameOver: false,
     };
-    console.log(`startNewGame, state: ${JSON.stringify(state)}`);   
     setGameState(state);
   };
 
