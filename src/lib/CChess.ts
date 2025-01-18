@@ -1,23 +1,30 @@
-import { getPieceColor, PlayerColor, type ChessState, type Piece, type Position } from './GameTypes';
-import { isValidMove } from '@/lib/moveValidation';
-import { char2piece, piece2char } from './util';
-import { clearChessState, loadChessState, saveChessState } from './storage';
-import { isBrowser } from './browserUtils';
+import {
+  getPieceColor,
+  Move,
+  PlayerColor,
+  type BoardState,
+  type Piece,
+  type Position,
+} from "./GameTypes";
+import { isValidMove } from "@/lib/moveValidation";
+import { char2piece, piece2char } from "./util";
+import { clearChessState, loadChessState, saveChessState } from "./storage";
+import { isBrowser } from "./browserUtils";
 
-function initGame(): ChessState {
+function initGame(): BoardState {
   return {
-      board: initializeBoard(),
-      selectedPosition: null,
-      lastMove: null,
-      currentTurn: 'red',
-      gameStatus: 'active'
+    board: initializeBoard(),
+    selectedPosition: null,
+    currentTurn: "red",
+    gameStatus: "active",
+    moveHistory: []
   };
 }
 
 function initializeBoard(): (Piece | null)[][] {
   const board: (Piece | null)[][] = Array(10)
-      .fill(null)
-      .map(() => Array(9).fill(null));
+    .fill(null)
+    .map(() => Array(9).fill(null));
 
   // Initialize the board with pieces
   // Black pieces (top)
@@ -68,74 +75,129 @@ function initializeBoard(): (Piece | null)[][] {
 }
 
 export class CChess {
-  private gameState: ChessState;
+  private state: BoardState;
 
   constructor() {
     // Initialize with a new game state by default
-    this.gameState = initGame();
-    
+    this.state = initGame();
+
     // Try to load saved state in browser environment
     if (isBrowser()) {
       const savedState = loadChessState();
       if (savedState) {
-        this.gameState = savedState;
+        this.state = savedState;
       }
     }
   }
 
-  public setGameState(state: ChessState): void {
-    this.gameState = state;
+  public setGameState(state: BoardState): void {
+    this.state = state;
   }
 
-  public getGameState(): ChessState {
+  public getGameState(): BoardState {
     return {
-      ...this.gameState,
-      board: this.gameState.board.map(row => [...row])
+      ...this.state,
+      board: this.state.board.map((row) => [...row]),
     };
   }
 
   public selectPiece(position: Position | null): void {
     console.log("selectPiece", position);
-    this.gameState.selectedPosition = position;
-    saveChessState(this.gameState);
+    this.state.selectedPosition = position;
+    saveChessState(this.state);
   }
 
-  public isValidMove(from: Position, to: Position): boolean {
-    const result = isValidMove(this.gameState, from, to);
-    return result.isValid;
+  public makeMove(move: Move): void {
+    if (!this.isValidMove(move)) {
+      throw new Error("Invalid move");
+    }
+
+    // Get the piece at the starting position
+    const piece = this.state.board[move.from.y][move.from.x];
+    if (!piece) return;
+
+    // Create new board with the move applied
+    const newBoard = this.state.board.map((row) => [...row]);
+
+    // Store captured piece for move history
+    const capturedPiece = newBoard[move.to.y][move.to.x];
+
+    // Make the move
+    newBoard[move.to.y][move.to.x] = piece;
+    newBoard[move.from.y][move.from.x] = null;
+
+    // Update move history and state
+    const moveWithCapture = {
+      ...move,
+      capturedPiece: capturedPiece || undefined,
+    };
+    this.state.moveHistory.push(moveWithCapture);
+    this.state.board = newBoard;
+    this.toggleTurn();
+
+    // Save the updated state
+    saveChessState(this.state);
+  }
+
+  public undoMove(): void {
+    const lastMove = this.state.moveHistory.pop();
+    if (!lastMove) return;
+
+    // Create new board
+    const newBoard = this.state.board.map((row) => [...row]);
+
+    // Get the piece at the current position
+    const piece = newBoard[lastMove.to.y][lastMove.to.x];
+    if (!piece) return;
+
+    // Move piece back to original position
+    newBoard[lastMove.from.y][lastMove.from.x] = piece;
+
+    // Restore captured piece if any
+    if (lastMove.capturedPiece) {
+      newBoard[lastMove.to.y][lastMove.to.x] = lastMove.capturedPiece;
+    } else {
+      newBoard[lastMove.to.y][lastMove.to.x] = null;
+    }
+
+    // Update game state
+    this.state.board = newBoard;
+    this.toggleTurn();
+
+    // Save the updated state
+    saveChessState(this.state);
   }
 
   public movePiece(from: Position, to: Position): void {
-    const newBoard = this.gameState.board.map(row => [...row]);
+    const newBoard = this.state.board.map((row) => [...row]);
     const piece = newBoard[from.y][from.x];
 
     newBoard[to.y][to.x] = piece;
     newBoard[from.y][from.x] = null;
 
-    const nextTurn = this.gameState.currentTurn === 'red' ? 'black' : 'red';
-    
+    const nextTurn = this.toggleTurn();
+
     // Check if the opponent's king is in check
     const isCheck = this.isKingInCheck(newBoard, nextTurn);
 
-    this.gameState = {
-      ...this.gameState,
-      lastMove: [from, to],
+    this.state = {
+      ...this.state,
       board: newBoard,
       selectedPosition: null,
       currentTurn: nextTurn,
-      gameStatus: isCheck ? 'check' : 'active',
+      gameStatus: isCheck ? "check" : "active",
     };
-    saveChessState(this.gameState);
+    saveChessState(this.state);
   }
 
   public reset(): void {
     clearChessState();
-    this.gameState = initGame();
+    this.state = initGame();
   }
 
-  public static toFen(gameState: ChessState): string {
-    const rows: string[] = gameState.board.map(row => {
-      let rowString = '';
+  public static toFen(gameState: BoardState): string {
+    const rows: string[] = gameState.board.map((row) => {
+      let rowString = "";
       let emptyCount = 0;
 
       for (const piece of row) {
@@ -155,15 +217,17 @@ export class CChess {
       return rowString;
     });
 
-    const turn = gameState.currentTurn === 'red' ? 'r' : 'b';
-    return `${rows.join('/')} ${turn} - - 0 1`;
+    const turn = gameState.currentTurn === "red" ? "r" : "b";
+    return `${rows.join("/")} ${turn} - - 0 1`;
   }
 
-  public static fromFen(fen: string): ChessState {
-    const [boardPart, turn] = fen.split(' ');
-    const board: (Piece | null)[][] = Array(10).fill(null).map(() => Array(9).fill(null));
+  public static fromFen(fen: string): BoardState {
+    const [boardPart, turn] = fen.split(" ");
+    const board: (Piece | null)[][] = Array(10)
+      .fill(null)
+      .map(() => Array(9).fill(null));
 
-    const rows = boardPart.split('/');
+    const rows = boardPart.split("/");
     for (let y = 0; y < rows.length; y++) {
       let x = 0;
       for (const char of rows[y]) {
@@ -178,18 +242,26 @@ export class CChess {
 
     return {
       board: board,
-      lastMove: null,
       selectedPosition: null,
-      currentTurn: turn === 'r' ? 'red' : 'black',
-      gameStatus: 'active'
+      currentTurn: turn === "r" ? "red" : "black",
+      gameStatus: "active",
+      moveHistory: []
     };
   }
 
-  private isKingInCheck(board: (Piece | null)[][], kingColor: PlayerColor): boolean {
+  public isValidMove(move: Move): boolean {
+    const result = isValidMove(this.state, move.from, move.to);
+    return result.isValid;
+  }
+
+  private isKingInCheck(
+    board: (Piece | null)[][],
+    kingColor: PlayerColor
+  ): boolean {
     // First find the king's position
     let kingPos: Position | null = null;
-    const kingPiece = kingColor === 'red' ? 'K' : 'k';
-    
+    const kingPiece = kingColor === "red" ? "K" : "k";
+
     for (let y = 0; y < board.length; y++) {
       for (let x = 0; x < board[y].length; x++) {
         if (board[y][x] === kingPiece) {
@@ -209,7 +281,7 @@ export class CChess {
         if (piece && getPieceColor(piece) !== kingColor) {
           const from: Position = { x, y };
           const result = isValidMove(
-            { ...this.gameState, board },
+            { ...this.state, board },
             from,
             kingPos
           );
@@ -222,6 +294,22 @@ export class CChess {
 
     return false;
   }
+
+  private toggleTurn(): PlayerColor {
+    const turn = this.state.currentTurn;
+    const nextTurn = turn === "red" ? "black" : "red";
+    this.state.currentTurn = nextTurn;
+    return nextTurn;
+  }
+
+  public getLegalMoves(): Move[] {
+    // Implement the logic to generate and return all legal moves
+    return this.generateLegalMoves();
+  }
+
+  private generateLegalMoves(): Move[] {
+    const legalMoves: Move[] = [];
+    // Your move generation logic here
+    return legalMoves;
+  }
 }
-
-

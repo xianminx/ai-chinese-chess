@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { ChessState } from "@/lib/GameTypes";
+import { BoardState } from "@/lib/GameTypes";
 import { isValidUCIMove, UCIMove } from "@/lib/ucci";
 import { CChess } from "@/lib/CChess";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
@@ -17,7 +17,7 @@ export class ChessAI {
     this.difficulty = "advanced";
   }
 
-  async getMove(board: ChessState): Promise<{
+  async getMove(board: BoardState): Promise<{
     success: boolean;
     move?: UCIMove;
     error?: string;

@@ -1,4 +1,4 @@
-import { ChessState } from "@/lib/GameTypes";
+import { BoardState } from "@/lib/GameTypes";
 
 export interface Message {
   id: string;
@@ -8,6 +8,6 @@ export interface Message {
 }
 
 export interface ChatComponentProps {
-  gameState: ChessState;
+  gameState: BoardState;
   isThinking: boolean;
 } 

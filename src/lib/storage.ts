@@ -1,15 +1,15 @@
-import type { ChessState } from './GameTypes';
+import type { BoardState } from './GameTypes';
 import { runInBrowser } from './browserUtils';
 
 const CHESS_STATE_KEY = 'chess_state';
 
-export const saveChessState = (state: ChessState): void => {
+export const saveChessState = (state: BoardState): void => {
   runInBrowser(() => {
     localStorage.setItem(CHESS_STATE_KEY, JSON.stringify(state));
   });
 };
 
-export const loadChessState = (): ChessState | null => {
+export const loadChessState = (): BoardState | null => {
   return runInBrowser(() => {
     const savedState = localStorage.getItem(CHESS_STATE_KEY);
     return savedState ? JSON.parse(savedState) : null;

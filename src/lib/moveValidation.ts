@@ -1,4 +1,4 @@
-import { ChessState, Position, MoveValidationResult, Piece, isRed, isBlack, getPieceColor } from "./GameTypes";
+import { BoardState, Position, MoveValidationResult, Piece, isRed, isBlack, getPieceColor } from "./GameTypes";
 
 // 棋子走法验证规则
 
@@ -43,7 +43,7 @@ const isValidGeneralMove = (
 // 3. 不能离开己方区域
 // 4. 不能吃自己的子
 const isValidAdvisorMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -70,7 +70,7 @@ const isValidAdvisorMove = (
 // 1. 直线走，横向或纵向，步数不限
 // 2. 不能越过其他棋子
 const isValidChariotMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -100,7 +100,7 @@ const isValidChariotMove = (
 // 1. 走"日"字，即两格直线加一格侧面
 // 2. 不能蹩马腿（马腿位置不能有棋子）
 const isValidHorseMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -125,7 +125,7 @@ const isValidHorseMove = (
 // 4. 每次只能走一步
 // 5. 不能吃自己的子
 const isValidSoldierMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -163,7 +163,7 @@ const isValidSoldierMove = (
 // 2. 不吃子时不能越过任何棋子
 // 3. 吃子时必须越过一个棋子（炮架）且只能越过一个
 const isValidCannonMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -214,7 +214,7 @@ const isValidCannonMove = (
 // 2. 不能过河
 // 3. 不能塞象眼（象眼位置不能有棋子）
 const isValidElephantMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   piece: Piece,
   from: Position,
   to: Position
@@ -240,7 +240,7 @@ const isValidElephantMove = (
 // 检查将军
 // 规则：判断是否有敌方棋子可以直接吃到将/帅
 const isGeneralInCheck = (
-  gameState: ChessState,
+  gameState: BoardState,
   generalPosition: Position,
   color: "red" | "black"
 ): boolean => {
@@ -263,7 +263,7 @@ const isGeneralInCheck = (
 // 1. 将帅不能在同一列直接对面
 // 2. 如果在同一列，中间必须有其他棋子
 const isGeneralsFacing = (
-  gameState: ChessState,
+  gameState: BoardState,
   from: Position,
   to: Position
 ): boolean => {
@@ -317,7 +317,7 @@ const isGeneralsFacing = (
 // 3. 检查目标位置是否有己方棋子
 // 4. 根据不同棋子类型验证走法
 export const isValidMove = (
-  gameState: ChessState,
+  gameState: BoardState,
   from: Position,
   to: Position
 ): MoveValidationResult => {

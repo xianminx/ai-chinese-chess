@@ -1,6 +1,6 @@
 import { DIFFICULTY_PROMPTS as DIFFICULTY_PROMPTS_2, SYSTEM_PROMPT as SYSTEM_PROMPT_2, getUserPrompt as getUserPrompt_2 } from "./prompts_2";
 import { DIFFICULTY_PROMPTS as DIFFICULTY_PROMPTS_1, SYSTEM_PROMPT as SYSTEM_PROMPT_1, getUserPrompt as  getUserPrompt_1 } from "./prompts_1";
-import { ChessState } from "@/lib/GameTypes";
+import { BoardState } from "@/lib/GameTypes";
 
 // eslint-disable-next-line prefer-const
 let PROMPT_VERSION = 2;
@@ -25,7 +25,7 @@ Use standard notation when discussing moves. When appropriate, reference famous 
 Remember: clarity over comprehensiveness. Focus on the most impactful advice for the current position or question. `;
 }
 
-export function getGameStatePrompt(gameState: ChessState) {
+export function getGameStatePrompt(gameState: BoardState) {
   return `Current game state:
 - Current turn: ${gameState.currentTurn}
 - Board position: ${JSON.stringify(gameState.board)}

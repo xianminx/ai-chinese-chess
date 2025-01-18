@@ -1,5 +1,5 @@
 "use client";
-import { Position, ChessState, getPieceColor, Piece } from "../lib/GameTypes";
+import { Position, BoardState, getPieceColor, Piece } from "../lib/GameTypes";
 import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { useSettings } from "./providers/SettingsProvider";
 
 interface ChessboardProps {
-  gameState: ChessState;
+  gameState: BoardState;
   onMove: (from: Position, to: Position) => boolean;
   onSelect: (position: Position | null) => void;
   onError: (message: string) => void;
@@ -159,12 +159,11 @@ export default function Chessboard({
       />
     );
 
-    const shouldAnimate =
-      gameState.lastMove && isSamePosition(gameState.lastMove[1], position);
+    const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1];
 
-    const fromPixels = shouldAnimate
-      ? getPixelPosition(gameState.lastMove![0])
-      : null;
+    const shouldAnimate = lastMove && isSamePosition(lastMove.to, position);
+
+    const fromPixels = shouldAnimate && lastMove.from ? getPixelPosition(lastMove.from) : null;
 
     const AnimatedCell = shouldAnimate ? motion.div : "div";
 
@@ -190,6 +189,7 @@ export default function Chessboard({
       </AnimatedCell>
     );
   };
+
 
   return (
     <div className="relative">

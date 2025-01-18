@@ -1,4 +1,4 @@
-import { ChessState } from "./GameTypes";
+import { BoardState } from "./GameTypes";
 
 interface ChatResponse {
   success: boolean;
@@ -9,7 +9,7 @@ interface ChatResponse {
 
 export async function sendChatMessage(
   message: string,
-  gameState: ChessState
+  gameState: BoardState
 ): Promise<ChatResponse> {
   try {
     const response = await fetch("/api/chat", {

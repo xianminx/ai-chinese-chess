@@ -1,4 +1,4 @@
-import { Position, Piece, Player, PieceType, BoardState, Move } from './xiangqi';
+import { Position, Piece, BoardState, Move } from '../GameTypes';
 
 export class Board {
   private state: BoardState;
@@ -8,53 +8,62 @@ export class Board {
   }
 
   private getInitialState(): BoardState {
-    const pieces = new Map<string, Piece>();
-    // Initialize the board with starting positions
-    this.initializePieces(pieces);
+    // Initialize empty 10x9 board
+    const board = Array(10).fill(null).map(() => Array(9).fill(null));
     
     return {
-      pieces,
-      currentPlayer: Player.Red,
-      moveHistory: []
+      board,
+      currentTurn: "red",
+      moveHistory: [],
+      gameStatus: "active",
+      selectedPosition: null,
+      lastMove: null
     };
   }
 
   private initializePieces(pieces: Map<string, Piece>): void {
-    // Initialize Red pieces
-    this.initializePlayer(Player.Red, pieces);
-    // Initialize Black pieces
-    this.initializePlayer(Player.Black, pieces);
+    this.initializePlayer("red", pieces);
+    this.initializePlayer("black", pieces);
+    this.syncBoardFromPieces();
   }
 
-  private initializePlayer(player: Player, pieces: Map<string, Piece>): void {
-    const backRank = player === Player.Red ? 0 : 9;
-    const soldierRank = player === Player.Red ? 3 : 6;
+  // New method to sync the board matrix from pieces Map
+  private syncBoardFromPieces(): void {
+    // Clear the board
+    for (let y = 0; y < 10; y++) {
+      for (let x = 0; x < 9; x++) {
+        this.state.board[y][x] = null;
+      }
+    }
 
-    // Place Chariots
-    pieces.set(this.getPositionKey({ x: 0, y: backRank }), {
-      type: PieceType.Chariot,
-      player,
-      position: { x: 0, y: backRank }
-    });
-    pieces.set(this.getPositionKey({ x: 8, y: backRank }), {
-      type: PieceType.Chariot,
-      player,
-      position: { x: 8, y: backRank }
-    });
+    // Place pieces on board
+    for (const piece of this.state.pieces.values()) {
+      const { x, y } = piece.position;
+      // Convert our piece type to GameTypes.Piece format (uppercase for red, lowercase for black)
+      const pieceChar = piece.player === 'red' 
+        ? piece.type.toUpperCase() 
+        : piece.type.toLowerCase();
+      this.state.board[y][x] = pieceChar as PieceType;
+    }
+  }
 
+  private initializePlayer(player: "red" | "black", pieces: Map<string, Piece>): void {
+    const backRank = player === "red" ? 0 : 9;
+    
+    // Place Chariots/Rooks
+    this.addPiece(pieces, 'R', player, { x: 0, y: backRank });
+    this.addPiece(pieces, 'R', player, { x: 8, y: backRank });
+    
     // Place Horses
-    pieces.set(this.getPositionKey({ x: 1, y: backRank }), {
-      type: PieceType.Horse,
-      player,
-      position: { x: 1, y: backRank }
-    });
-    pieces.set(this.getPositionKey({ x: 7, y: backRank }), {
-      type: PieceType.Horse,
-      player,
-      position: { x: 7, y: backRank }
-    });
+    this.addPiece(pieces, 'H', player, { x: 1, y: backRank });
+    this.addPiece(pieces, 'H', player, { x: 7, y: backRank });
+    
+    // Add other pieces...
+  }
 
-    // ... Add other pieces initialization
+  private addPiece(pieces: Map<string, Piece>, type: PieceType, player: "red" | "black", position: Position) {
+    const piece: Piece = { type, player, position };
+    pieces.set(this.getPositionKey(position), piece);
   }
 
   private getPositionKey(position: Position): string {
@@ -74,19 +83,20 @@ export class Board {
     const fromKey = this.getPositionKey(move.from);
     const toKey = this.getPositionKey(move.to);
 
-    // Update piece positions
+    // Update pieces Map
     const piece = this.state.pieces.get(fromKey);
     if (!piece) return;
 
     this.state.pieces.delete(fromKey);
     this.state.pieces.set(toKey, { ...piece, position: move.to });
 
-    // Update move history
+    // Sync the board matrix
+    this.syncBoardFromPieces();
+
+    // Update move history and state
     this.state.moveHistory.push(move);
-    
-    // Switch current player
-    this.state.currentPlayer = 
-      this.state.currentPlayer === Player.Red ? Player.Black : Player.Red;
+    this.state.lastMove = [move.from, move.to];
+    this.state.currentTurn = this.state.currentTurn === "red" ? "black" : "red";
   }
 
   public undoMove(): void {
@@ -109,7 +119,7 @@ export class Board {
     }
 
     // Switch back current player
-    this.state.currentPlayer = 
-      this.state.currentPlayer === Player.Red ? Player.Black : Player.Red;
+    this.state.currentTurn = 
+      this.state.currentTurn === "red" ? "black" : "red";
   }
 }

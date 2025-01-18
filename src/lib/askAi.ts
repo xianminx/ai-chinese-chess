@@ -1,4 +1,4 @@
-import { ChessState, getPieceCharacter, isRed, Position } from "./GameTypes";
+import { BoardState, getPieceCharacter, isRed, Position } from "./GameTypes";
 import { isValidMove } from "./moveValidation";
 import { parseMove } from "./ucci";
 
@@ -6,7 +6,7 @@ import { parseMove } from "./ucci";
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function getAIMoveWithRetry(
-  chessState: ChessState,
+  chessState: BoardState,
   maxRetries: number = 3,
   retryDelay: number = 1000
 ): Promise<{
@@ -36,7 +36,7 @@ export async function getAIMoveWithRetry(
   };
 }
 
-export async function getAIMove(chessState: ChessState): Promise<{
+export async function getAIMove(chessState: BoardState): Promise<{
   success: boolean;
   aimove?: [Position, Position];
   message?: string;
