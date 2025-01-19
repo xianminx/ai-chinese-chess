@@ -22,9 +22,8 @@ export const useGameState = () => {
             if (cchess.isValidMove(state, move)) {
                 console.log(
                     "valid move",
-                    state.currentTurn,
-                    move.from,
-                    move.to
+                    JSON.stringify(state),
+                    JSON.stringify(move),
                 );
                 const newState = cchess.makeMove(state, move);
                 setState(newState);

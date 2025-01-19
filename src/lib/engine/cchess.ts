@@ -105,7 +105,7 @@ export function makeMove(state: BoardState, move: Move): BoardState {
 }
 
 export function undoMove(state: BoardState): BoardState {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    const lastMove = getLastMove(state);
     if (!lastMove) return state;
 
     // Create new board
@@ -136,6 +136,10 @@ export function undoMove(state: BoardState): BoardState {
 
 export function reset(): BoardState {
     return initGame();
+}
+
+export function getLastMove(state: BoardState): Move | null {
+    return state && state.moveHistory && state.moveHistory.length > 0 ? state.moveHistory[state.moveHistory.length - 1] : null;
 }
 
 export function toFen(state: BoardState): string {
@@ -190,6 +194,7 @@ export function fromFen(fen: string): BoardState {
         moveHistory: [],
     };
 }
+
 
 export function isValidMove(
     state: BoardState,
@@ -278,5 +283,6 @@ const chess = {
     isKingInCheck,
     doesMoveCauseCheck,
     getLegalMoves,
+    getLastMove,
 };
 export default chess;
