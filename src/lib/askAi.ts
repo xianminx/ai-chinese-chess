@@ -1,5 +1,6 @@
-import { BoardState, getPieceCharacter, isRed, Position } from "./GameTypes";
-import { isValidMove } from "./moveValidation";
+import { BoardState, Position } from "./engine/types";
+import { getPieceCharacter, isRed } from "./engine/utils";
+import { isValidMove } from "./engine/moveUtils";
 import { parseMove } from "./ucci";
 
 // Helper function for delay

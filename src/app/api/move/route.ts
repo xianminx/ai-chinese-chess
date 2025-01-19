@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { BoardState } from "@/lib/GameTypes";
+import type { BoardState } from "@/lib/engine/types";
 import { ChessAI } from "./chessAI";
 
 export async function POST(request: Request) {

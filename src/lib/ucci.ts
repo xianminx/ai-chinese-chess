@@ -1,4 +1,4 @@
-import { Position } from "./GameTypes";
+import { Position } from "./engine/types";
 
 // Define the file type for Chinese Chess (Xiangqi)
 type File = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i";

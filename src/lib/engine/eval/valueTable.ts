@@ -1,4 +1,4 @@
-import { Piece } from "../GameTypes";
+import { Piece } from "../types";
 
 export const PIECE_VALUES: Record<Piece, number> = {
     'K': 6000, 'k': 6000,

@@ -1,6 +1,6 @@
 "use client";
 import Chessboard from "./Chessboard";
-import { useCChessState } from "../hooks/useGameState";
+import { useGameState } from "../hooks/useGameState";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { getAIMoveWithRetry } from "../lib/askAi";
@@ -8,9 +8,11 @@ import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
 import ChatComponent from "./chat/ChatComponent";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import cchess from "@/lib/engine/cchess";
+import { Move } from "@/lib/engine/types";
 
 export default function Game() {
-    const { gameState, onMove, onSelect, onReset } = useCChessState();
+    const { state, onMove, onReset } = useGameState();
     const [showConfirm, setShowConfirm] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
     const playStartSound = useAudio("/audio/start.mp3");
@@ -81,7 +83,7 @@ export default function Game() {
         setIsThinking(true);
         try {
             const { success, aimove, message, explanation, debugInfo } =
-                await getAIMoveWithRetry(gameState);
+                await getAIMoveWithRetry(state);
             console.log(
                 "AI返回的数据",
                 JSON.stringify({ success, aimove, message, explanation, debugInfo })
@@ -92,7 +94,8 @@ export default function Game() {
                     explanation || "AI正在思考最佳走法..."
                 );
                 const [from, to] = aimove;
-                onMove(from, to);
+                const move: Move = { from, to };
+                onMove(move);
                 playMoveSound();
                 console.log(debugInfo);
             } else {
@@ -132,7 +135,7 @@ export default function Game() {
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
                         <div className="text-lg text-gray-600">
                             {t("game.currentTurn")}:{" "}
-                            {gameState.currentTurn === "red" ? (
+                            {state.currentTurn === "red" ? (
                                 <span className="text-red-400 font-bold text-lg">
                                     {t("game.red")}
                                 </span>
@@ -172,9 +175,9 @@ export default function Game() {
 
                 <div className="w-full max-w-2xl aspect-square">
                     <Chessboard
-                        gameState={gameState}
+                        state={state}
+                        isValidMove={cchess.isValidMove}
                         onMove={onMove}
-                        onSelect={onSelect}
                         onError={(message) => toast.error(message, { duration: 3000 })}
                         showCoordinates={true}
                     />
@@ -183,7 +186,7 @@ export default function Game() {
 
             {/* Floating Chat Component */}
             <ChatComponent
-                gameState={gameState}
+                state={state}
                 isThinking={isThinking}
             />
 

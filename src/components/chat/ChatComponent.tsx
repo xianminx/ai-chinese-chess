@@ -1,13 +1,20 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { sendChatMessage } from "@/lib/chatService";
-import { Message, ChatComponentProps } from './types';
+import { Message } from './types';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 import ChatIcon from '../icons/ChatIcon';
+import { BoardState } from "@/lib/engine/types";
 
-export default function ChatComponent({ gameState, isThinking }: ChatComponentProps) {
+
+interface ChatComponentProps {
+  state: BoardState;
+  isThinking: boolean;
+} 
+
+export default function ChatComponent({ state, isThinking }: ChatComponentProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -36,7 +43,7 @@ export default function ChatComponent({ gameState, isThinking }: ChatComponentPr
     setInput("");
     
     try {
-      const response = await sendChatMessage(input, gameState);
+      const response = await sendChatMessage(input, state);
       
       if (response.success && response.message) {
         const aiMessage: Message = {

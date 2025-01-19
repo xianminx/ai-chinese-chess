@@ -1,23 +1,25 @@
-import { CChess } from '../CChess';
-import { Move, MoveEvaluation } from '../GameTypes';
-import { Evaluator } from './evaluation';
+import cchess from './cchess';
+import { BoardState, Move, MoveEvaluation } from './types';
+import { Evaluator } from './eval/evaluation';
+import { PIECE_VALUES } from './eval/valueTable';
+import { cloneState } from './utils';
 
 export class SearchEngine {
-  private cchess: CChess;
   private evaluator: Evaluator;
 
-  constructor(cchess: CChess) {
-    this.cchess = cchess;
+  constructor() {
     this.evaluator = new Evaluator();
   }
 
-  public findBestMove(maxDepth: number): MoveEvaluation {
+  public findBestMove(state: BoardState, maxDepth: number): MoveEvaluation {
     const alpha = -Infinity;
     const beta = Infinity;
-    return this.alphaBeta(maxDepth, alpha, beta, true);
+    const clonedState = cloneState(state);
+    return this.alphaBeta(clonedState, maxDepth, alpha, beta, true);
   }
 
   private alphaBeta(
+    state: BoardState,
     depth: number,
     alpha: number,
     beta: number,
@@ -25,26 +27,27 @@ export class SearchEngine {
   ): MoveEvaluation {
     if (depth === 0) {
       return {
-        move: null as any,
-        score: this.evaluator.evaluate(this.cchess.getGameState())
+        move: null,
+        score: this.evaluator.evaluate(state)
       };
     }
 
-    const moves = this.generateOrderedMoves();
+    const moves = this.generateOrderedMoves(state);
     let bestMove: Move | null = null;
     let bestScore = isMaximizing ? -Infinity : Infinity;
 
     for (const move of moves) {
-      this.cchess.makeMove(move);
+      const newState = cchess.makeMove(state,move);
       
       const evaluation = this.alphaBeta(
+        newState,
         depth - 1,
         alpha,
         beta,
         !isMaximizing
       );
 
-      this.cchess.undoMove();
+      // this.cchess.undoMove();
 
       if (isMaximizing) {
         if (evaluation.score > bestScore) {
@@ -71,64 +74,55 @@ export class SearchEngine {
     };
   }
 
-  private generateOrderedMoves(): Move[] {
+  private generateOrderedMoves(state: BoardState): Move[] {
     // Generate and order moves for better alpha-beta pruning efficiency
-    const moves = this.generateLegalMoves();
-    return this.orderMoves(moves);
+    const moves = this.generateLegalMoves(state);
+    return this.orderMoves(state, moves);
   }
 
-  private generateLegalMoves(): Move[] {
+  private generateLegalMoves(state: BoardState): Move[] {
     // Implement legal move generation
-    // Utilize the CChess instance to retrieve all legal moves
-    return this.cchess.getLegalMoves();
+    // Utilize the cchess instance to retrieve all legal moves
+    return cchess.getLegalMoves(state);
   }
 
-  private orderMoves(moves: Move[]): Move[] {
+  private orderMoves(state: BoardState, moves: Move[]): Move[] {
     // Implement move ordering for better pruning
     // Order moves based on move history and heuristic evaluations
     return moves.sort((a, b) => {
-      const aScore = this.evaluateMove(a);
-      const bScore = this.evaluateMove(b);
+      const aScore = this.evaluateMove(state, a);
+      const bScore = this.evaluateMove(state, b);
       return bScore - aScore; // Descending order
     });
   }
 
   // Add a helper method to evaluate moves for ordering
-  private evaluateMove(move: Move): number {
+  private evaluateMove(state: BoardState, move: Move): number {
     let score = 0;
 
     // Priority 1: Captures
-    if (move.isCapture) {
+    if (move.capturedPiece) {
       score += 100;
-      const capturedPieceValue = this.valueTable[move.capturedPiece];
+      const capturedPieceValue = PIECE_VALUES[move.capturedPiece];
       score += capturedPieceValue || 0;
     }
 
     // Priority 2: Checks
-    if (move.causesCheck) {
+    if (cchess.doesMoveCauseCheck(state, move)) {
       score += 50;
     }
 
     // Priority 3: Historical Move Heuristics
-    score += this.getHistoricalScore(move);
+    score += this.getHistoricalScore(state, move);
 
     return score;
   }
 
-  // Example value table for piece values
-  private valueTable: { [key: string]: number } = {
-    'pawn': 10,
-    'knight': 30,
-    'bishop': 30,
-    'rook': 50,
-    'queen': 90,
-    'king': 1000
-  };
 
   // Placeholder for historical move scores
   private moveHistory: { [key: string]: number } = {};
 
-  private getHistoricalScore(move: Move): number {
+  private getHistoricalScore(state: BoardState, move: Move): number {
     const key = `${move.from}-${move.to}`;
     return this.moveHistory[key] || 0;
   }

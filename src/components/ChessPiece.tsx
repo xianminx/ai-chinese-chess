@@ -1,5 +1,6 @@
 "use client";
-import { Piece, ShowType, isRed } from "@/lib/GameTypes";
+import { Piece, ShowType } from "@/lib/engine/types";
+import { isRed } from "@/lib/engine/utils";
 import { useMemo } from "react";
 
 const PieceImage: { [key in Uppercase<Piece>]: string } = {

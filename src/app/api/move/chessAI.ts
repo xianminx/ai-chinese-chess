@@ -1,7 +1,7 @@
 import OpenAI from "openai";
-import { BoardState } from "@/lib/GameTypes";
+import { BoardState } from "@/lib/engine/types";
 import { isValidUCIMove, UCIMove } from "@/lib/ucci";
-import { CChess } from "@/lib/CChess";
+import cchess from "@/lib/engine/cchess";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { DIFFICULTY_PROMPTS, getUserPrompt, SYSTEM_PROMPT } from "./prompts";
 
@@ -23,7 +23,7 @@ export class ChessAI {
     error?: string;
     debugInfo?: object;
   }> {
-    const fen = CChess.toFen(board);
+    const fen = cchess.toFen(board);
     const model = MODEL;
     const isO1 = model.toLowerCase().includes("o1");
     // o1 series models are not using system prompt, and do not support temperature and max_tokens

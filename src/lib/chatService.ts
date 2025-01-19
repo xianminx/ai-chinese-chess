@@ -1,4 +1,4 @@
-import { BoardState } from "./GameTypes";
+import { BoardState } from "./engine/types";
 
 interface ChatResponse {
   success: boolean;

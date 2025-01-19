@@ -1,4 +1,4 @@
-import { Piece, ShowType } from "../lib/GameTypes";
+import { Piece, ShowType } from "../lib/engine/types";
 import ChessPiece from "./ChessPiece";
 
 interface CellProps {

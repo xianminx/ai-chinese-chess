@@ -1,4 +1,4 @@
-import type { BoardState } from './GameTypes';
+import type { BoardState } from './engine/types';
 import { runInBrowser } from './browserUtils';
 
 const CHESS_STATE_KEY = 'chess_state';

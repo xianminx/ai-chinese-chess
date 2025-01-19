@@ -1,11 +1,12 @@
-import { Board } from './board';
 import { SearchEngine } from './search';
+import cchess from './cchess';
 
 // Initialize the game
-const board = new Board();
-const searchEngine = new SearchEngine(board);
+
+const state = cchess.initGame();
+const searchEngine = new SearchEngine();
 
 // Example usage
 const MAX_DEPTH = 4;
-const bestMove = searchEngine.findBestMove(MAX_DEPTH);
+const bestMove = searchEngine.findBestMove(state, MAX_DEPTH);
 console.log('Best move:', bestMove);
