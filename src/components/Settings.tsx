@@ -48,7 +48,7 @@ export default function Settings() {
       <Button
         isIconOnly
         variant="light"
-        onClick={() => setIsOpen(!isOpen)}
+        onPress={() => setIsOpen(!isOpen)}
         className={`fixed top-4 right-4 z-50 ${
           isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
@@ -62,6 +62,8 @@ export default function Settings() {
         className={`fixed top-0 right-0 h-full w-full sm:w-[400px] transform transition-transform duration-300 ease-in-out z-40 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        role="dialog"
+        aria-label={t("settings.title")}
       >
         <Card className="h-full rounded-none sm:rounded-l-2xl flex flex-col">
           <CardHeader className="flex justify-between items-center px-6 py-4 shrink-0">
@@ -69,7 +71,7 @@ export default function Settings() {
             <Button
               isIconOnly
               variant="light"
-              onClick={() => setIsOpen(false)}
+              onPress={() => setIsOpen(false)}
               size="sm"
             >
               <IoCloseOutline className="w-5 h-5" />
@@ -106,31 +108,93 @@ export default function Settings() {
                     />
                   </div>
 
-                  {/* AI Model Select */}
-                  <div className="space-y-2 px-1">
-                    <label className="text-sm font-medium block text-default-700">
-                      {t("settings.aiSettings.aiModel")}
-                    </label>
-                    <Select
-                      selectedKeys={[settings.model]}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          model: e.target.value as SettingsType["model"],
-                        })
-                      }
-                      className="w-full"
-                      isDisabled={!settings.aiMode}
-                      size="sm"
-                      variant="flat"
-                    >
-                      {MODEL_OPTIONS.map((model) => (
-                        <SelectItem key={model} value={model}>
-                          {model}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  </div>
+                  {/* Only show AI Engine options if AI mode is enabled */}
+                  {settings.aiMode && (
+                    <>
+                      {/* AI Engine Select */}
+                      <div className="space-y-2 px-1">
+                        <label className="text-sm font-medium block text-default-700">
+                          {t("settings.aiSettings.aiEngine")}
+                        </label>
+                        <Select
+                          selectedKeys={[settings.aiEngine]}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              aiEngine: e.target.value as "LLM" | "MINIMAX",
+                            })
+                          }
+                          className="w-full"
+                          size="sm"
+                          variant="flat"
+                        >
+                          <SelectItem key="LLM" value="LLM">
+                            LLM Agent
+                          </SelectItem>
+                          <SelectItem key="MINIMAX" value="MINIMAX">
+                            Minimax
+                          </SelectItem>
+                        </Select>
+                      </div>
+
+                      {settings.aiEngine === 'MINIMAX' && (
+                        <div className="space-y-2 px-1">
+                          <label className="text-sm font-medium block text-default-700">
+                            {t("settings.aiSettings.aiDifficulty")}
+                          </label>
+                          <Select
+                            selectedKeys={[settings.minimaxDepth?.toString() || "3"]}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                minimaxDepth: parseInt(e.target.value),
+                              })
+                            }
+                            className="w-full"
+                            size="sm"
+                            variant="flat"
+                          >
+                            <SelectItem key="2" value="2">
+                              {t("settings.aiSettings.difficultyLevels.easy")}
+                            </SelectItem>
+                            <SelectItem key="3" value="3">
+                              {t("settings.aiSettings.difficultyLevels.medium")}
+                            </SelectItem>
+                            <SelectItem key="4" value="4">
+                              {t("settings.aiSettings.difficultyLevels.hard")}
+                            </SelectItem>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* AI Model Select - Only show when LLM engine is selected */}
+                      {settings.aiEngine === "LLM" && (
+                        <div className="space-y-2 px-1">
+                          <label className="text-sm font-medium block text-default-700">
+                            {t("settings.aiSettings.aiModel")}
+                          </label>
+                          <Select
+                            selectedKeys={[settings.model]}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                model: e.target.value as SettingsType["model"],
+                              })
+                            }
+                            className="w-full"
+                            size="sm"
+                            variant="flat"
+                          >
+                            {MODEL_OPTIONS.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {model}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* Display Settings Group */}
@@ -246,6 +310,8 @@ export default function Settings() {
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30"
           onClick={() => setIsOpen(false)}
+          role="button"
+          aria-label={t("settings.close")}
         />
       )}
     </>

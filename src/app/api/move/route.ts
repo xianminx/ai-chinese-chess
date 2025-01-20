@@ -4,11 +4,11 @@ import { ChessAI } from "./chessAI";
 
 export async function POST(request: Request) {
     try {
-        const chessState: BoardState = await request.json();
+        const { state, model }: { state: BoardState, model?: string } = await request.json();
         // console.log('chessState', chessState);
 
         const ai = new ChessAI();
-        const result = await ai.getMove(chessState);
+        const result = await ai.getMove(state, model);
         return NextResponse.json(result, { status: result.success ? 200 : 400 });
     } catch (error: unknown) {
         console.error("Error processing move:", error);

@@ -1,19 +1,70 @@
-import { BoardState, Position, MoveValidationResult, Piece } from "./types";
+import { makeMove } from "./cchess";
+import { BoardState, Position, MoveValidationResult, Piece, PlayerColor } from "./types";
 import { isRed, isBlack, getPieceColor } from "./utils";
 import { isSamePosition } from "./utils";
 // 棋子走法验证规则
 
-// 检查是否在棋盘范围内
-const isWithinBoard = (pos: Position): boolean => {
-  return pos.x >= 0 && pos.x < 9 && pos.y >= 0 && pos.y < 10;
-};
+// Shared helper functions for both validation and generation
+export function isOnBoard(pos: Position): boolean {
+    return pos.x >= 0 && pos.x < 9 && pos.y >= 0 && pos.y < 10;
+}
 
-// 检查是否在九宫格内
-// 帅(将)不能离开九宫格：上三行，左右各三列
-const isInPalace = (pos: Position, color: "red" | "black"): boolean => {
-  const y = color === "red" ? [7, 8, 9] : [0, 1, 2];
-  return pos.x >= 3 && pos.x <= 5 && y.includes(pos.y);
-};
+export function isInPalace(pos: Position, color: PlayerColor): boolean {
+    if (pos.x < 3 || pos.x > 5) return false;
+    if (color === 'red') {
+        return pos.y >= 7 && pos.y <= 9;
+    } else {
+        return pos.y >= 0 && pos.y <= 2;
+    }
+}
+
+export function hasCrossedRiver(pos: Position, color: PlayerColor): boolean {
+    return color === 'red' ? pos.y <= 4 : pos.y >= 5;
+}
+
+// Helper to check if a path is clear between two positions
+export function isPathClear(
+    board: (Piece | null)[][],
+    from: Position,
+    to: Position,
+    skipFirst: boolean = false
+): boolean {
+    const dx = Math.sign(to.x - from.x);
+    const dy = Math.sign(to.y - from.y);
+    let x = from.x + (skipFirst ? dx : 0);
+    let y = from.y + (skipFirst ? dy : 0);
+
+    while (x !== to.x || y !== to.y) {
+        if (board[y][x] !== null) {
+            return false;
+        }
+        x += dx;
+        y += dy;
+    }
+    return true;
+}
+
+// Helper to count pieces between two positions
+export function countPiecesBetween(
+    board: (Piece | null)[][],
+    from: Position,
+    to: Position
+): number {
+    let count = 0;
+    const dx = Math.sign(to.x - from.x);
+    const dy = Math.sign(to.y - from.y);
+    let x = from.x + dx;
+    let y = from.y + dy;
+
+    while (x !== to.x || y !== to.y) {
+        if (board[y][x] !== null) {
+            count++;
+        }
+        x += dx;
+        y += dy;
+    }
+    return count;
+}
 
 // 将/帅走法验证
 // 规则：
@@ -233,27 +284,6 @@ const isValidElephantMove = (
   return true;
 };
 
-// 检查将军
-// 规则：判断是否有敌方棋子可以直接吃到将/帅
-const isGeneralInCheck = (
-  state: BoardState,
-  generalPosition: Position,
-  color: "red" | "black"
-): boolean => {
-  // Iterate through all enemy pieces and check if any can reach the general
-  for (let y = 0; y < state.board.length; y++) {
-    for (let x = 0; x < state.board[y].length; x++) {
-      const piece = state.board[y][x];
-      if (piece && getPieceColor(piece) !== color) {
-        if (isValidMove(state, { x, y }, generalPosition)) {
-          return true; // The general is in check
-        }
-      }
-    }
-  }
-  return false; // The general is not in check
-};
-
 // 将帅对面检查
 // 规则：
 // 1. 将帅不能在同一列直接对面
@@ -331,7 +361,7 @@ export const isValidMove = (
     };
   }
 
-  if (!isWithinBoard(to)) {
+  if (!isOnBoard(to)) {
     return { isValid: false, reason: "目标位置超出棋盘范围" };
   }
 
@@ -353,7 +383,8 @@ export const isValidMove = (
       if (isGeneralsFacing(state, from, to)) {
         return { isValid: false, reason: "将帅不能面对面" };
       }
-      if (isGeneralInCheck(state, to, getPieceColor(piece))) {
+      const newState = makeMove(state, { piece, from, to });
+      if (isKingInCheck(newState, getPieceColor(piece))) {
         return { isValid: false, reason: "不能送将" };
       }
       return { isValid: true };
@@ -401,3 +432,39 @@ export const isValidMove = (
       return { isValid: false, reason: "无效的棋子类型" };
   }
 };
+
+function findKingPosition(state: BoardState, color: PlayerColor): Position | null {  
+  const kingPiece = color === 'red' ? 'K' : 'k';
+  for (let y = 0; y < 10; y++) {
+      for (let x = 0; x < 9; x++) {
+          if (state.board[y][x] === kingPiece) {
+              return { x, y };
+          }
+      }
+  }
+
+  return null;
+}
+
+export function isKingInCheck(
+    state: BoardState,
+    kingColor: PlayerColor
+): boolean {
+    const kingPos = findKingPosition(state, kingColor);
+    if (!kingPos) return false;
+
+    // Check if any opponent piece can capture the king
+    for (let y = 0; y < state.board.length; y++) {
+        for (let x = 0; x < state.board[y].length; x++) {
+            const piece = state.board[y][x];
+            if (piece && getPieceColor(piece) !== kingColor) {
+                const result = isValidMove(state, { x, y }, kingPos);
+                if (result.isValid) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}

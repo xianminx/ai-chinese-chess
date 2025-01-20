@@ -3,14 +3,13 @@ import Chessboard from "./Chessboard";
 import { useGameState } from "../hooks/useGameState";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
-import { getAIMoveWithRetry } from "../lib/askAi";
 import { useAudio } from "@/hooks/useAudio.tsx";
 import Image from "next/image";
 import ChatComponent from "./chat/ChatComponent";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import cchess from "@/lib/engine/cchess";
-import { Move } from "@/lib/engine/types";
-
+import { getAIEngine } from "@/lib/ai";
+import { useSettings } from "./providers/SettingsProvider";
 export default function Game() {
     const { state, onMove, onReset } = useGameState();
     const [showConfirm, setShowConfirm] = useState(false);
@@ -18,6 +17,9 @@ export default function Game() {
     const playStartSound = useAudio("/audio/start.mp3");
     const playMoveSound = useAudio("/audio/click.wav");
     const { t, mounted: languageMounted } = useLanguage();
+    const { settings } = useSettings();
+
+    const [aiEngine] = useState(() => getAIEngine());
 
     const handleReset = () => {
         setShowConfirm(true);
@@ -82,19 +84,18 @@ export default function Game() {
     const handleAskAI = async () => {
         setIsThinking(true);
         try {
-            const { success, aimove, message, explanation, debugInfo } =
-                await getAIMoveWithRetry(state);
+            const result = await aiEngine.findBestMove(state, settings);
+            const { success, move, message, explanation, debugInfo } = result;
             console.log(
                 "AI返回的数据",
-                JSON.stringify({ success, aimove, message, explanation, debugInfo })
+                JSON.stringify(result)
             );
-            if (aimove && success) {
+            if (move && success) {
                 aiThinking(
-                    message || "AI思考中...",
-                    explanation || "AI正在思考最佳走法..."
+                    message as string || "AI思考中...",
+                    explanation as string || "AI正在思考最佳走法..."
                 );
-                const [from, to] = aimove;
-                const move: Move = { from, to };
+
                 onMove(move);
                 playMoveSound();
                 console.log(debugInfo);
@@ -127,7 +128,7 @@ export default function Game() {
             <div className="w-full max-w-4xl flex flex-col items-center gap-6">
                 <div className="flex-col gap-4 sm:flex-row sm:justify-between items-center p-4 w-full">
                     <div className="flex justify-center items-center gap-2 pb-4">
-                        <Image src="/icon.svg" alt="icon" width={40} height={40} />
+                        <Image src="/logo.svg" alt="icon" width={40} height={40} />
                         <h1 className="text-2xl font-bold text-default-900 dark:text-gray-400">
                             {t("game.title")}
                         </h1>

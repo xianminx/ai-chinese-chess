@@ -14,12 +14,16 @@ export type SettingsType = {
     aiMode: boolean;
     model: typeof MODEL_OPTIONS[number];
     useIcons: boolean;
+    aiEngine: "LLM" | "MINIMAX";
+    minimaxDepth: number;
 };
 
 const defaultSettings: SettingsType = {
     aiMode: false,
     model: 'gpt-4o-mini',
     useIcons: true,
+    aiEngine: "LLM",
+    minimaxDepth: 3,
 };
 
 const SettingsContext = createContext<{

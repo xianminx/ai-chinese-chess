@@ -20,11 +20,6 @@ export const useGameState = () => {
     const handleMove = useCallback(
         (move: Move) => {
             if (cchess.isValidMove(state, move)) {
-                console.log(
-                    "valid move",
-                    JSON.stringify(state),
-                    JSON.stringify(move),
-                );
                 const newState = cchess.makeMove(state, move);
                 setState(newState);
                 saveChessState(newState);
@@ -37,9 +32,10 @@ export const useGameState = () => {
     );
 
     const handleReset = useCallback(() => {
-        setState(cchess.initGame());
-        saveChessState(state);
-    }, [state]);
+        const newState = cchess.initGame(); 
+        setState(newState);
+        saveChessState(newState);
+    }, []);
 
     const handleUndo = useCallback(() => {
         const newState = cchess.undoMove(state);

@@ -1,0 +1,25 @@
+## API
+
+### 1. 获取棋盘状态
+
+```bash
+curl http://localhost:3000/api/board
+```
+
+
+[How can I use Python and JavaScript in the same application?](https://vercel.com/guides/how-to-use-python-and-javascript-in-the-same-application#how-can-i-use-python-and-javascript-in-the-same-application)
+
+
+### FastAPI 文档
+https://github.com/digitros/nextjs-fastapi
+
+How It Works
+The Python/FastAPI server is mapped into to Next.js app under /api/.
+
+This is implemented using next.config.js rewrites to map any request to /api/py/:path* to the FastAPI API, which is hosted in the /api folder.
+
+Also, the app/api routes are available on the same domain, so you can use NextJs Route Handlers and make requests to /api/....
+
+On localhost, the rewrite will be made to the 127.0.0.1:8000 port, which is where the FastAPI server is running.
+
+In production, the FastAPI server is hosted as Python serverless functions on Vercel.

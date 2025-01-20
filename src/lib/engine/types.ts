@@ -67,7 +67,7 @@ export interface Move {
 
 // Utility type for move evaluation results
 export interface MoveEvaluation {
-    move: Move | null;
+    move?: Move;
     score: number;
 }
 

@@ -5,7 +5,18 @@ export const translations = {
       aiSettings: {
         title: "AI Settings",
         playWithAI: "Play with AI",
-        aiModel: "AI Model"
+        aiModel: "AI Model",
+        aiEngine: "AI Engine",
+        aiEngineOptions: {
+          LLM: "LLM Agent",
+          MINIMAX: "Minimax with Alpha-Beta Pruning"
+        },
+        aiDifficulty: "AI Difficulty",
+        difficultyLevels: {
+          easy: "Easy",
+          medium: "Medium",
+          hard: "Hard"
+        }
       },
       displaySettings: {
         title: "Display Settings",
@@ -22,7 +33,8 @@ export const translations = {
           es: "Español",
           zh: "中文"
         }
-      }
+      },
+      close: "Close settings"
     },
     game: {
       title: "Chinese Chess",
@@ -63,7 +75,8 @@ export const translations = {
           es: "Español",
           zh: "中文"
         }
-      }
+      },
+      close: "Cerrar ajustes"
     },
     game: {
       title: "Ajedrez Chino",
@@ -104,7 +117,8 @@ export const translations = {
           es: "Español",
           zh: "中文"
         }
-      }
+      },
+      close: "关闭设置"
     },
     game: {
       title: "中国象棋",

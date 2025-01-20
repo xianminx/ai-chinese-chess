@@ -11,11 +11,11 @@ export class SearchEngine {
     this.evaluator = new Evaluator();
   }
 
-  public findBestMove(state: BoardState, maxDepth: number): MoveEvaluation {
+  public findBestMove(state: BoardState, depth: number): MoveEvaluation {
     const alpha = -Infinity;
     const beta = Infinity;
     const clonedState = cloneState(state);
-    return this.alphaBeta(clonedState, maxDepth, alpha, beta, true);
+    return this.alphaBeta(clonedState, depth, alpha, beta, true);
   }
 
   private alphaBeta(
@@ -25,18 +25,24 @@ export class SearchEngine {
     beta: number,
     isMaximizing: boolean
   ): MoveEvaluation {
+    console.log("alphaBeta", state, depth, alpha, beta, isMaximizing);
     if (depth === 0) {
+      const score = this.evaluator.evaluate(state); 
+      console.log("evaluate", score);
       return {
-        move: null,
-        score: this.evaluator.evaluate(state)
+        move: undefined,
+        score: score
       };
     }
 
     const moves = this.generateOrderedMoves(state);
-    let bestMove: Move | null = null;
+    let bestMove: Move | undefined = undefined;
     let bestScore = isMaximizing ? -Infinity : Infinity;
 
     for (const move of moves) {
+      if (!cchess.isValidMove(state, move)) {
+        continue;
+      }
       const newState = cchess.makeMove(state,move);
       
       const evaluation = this.alphaBeta(
@@ -76,14 +82,8 @@ export class SearchEngine {
 
   private generateOrderedMoves(state: BoardState): Move[] {
     // Generate and order moves for better alpha-beta pruning efficiency
-    const moves = this.generateLegalMoves(state);
+    const moves = cchess.getLegalMoves(state);
     return this.orderMoves(state, moves);
-  }
-
-  private generateLegalMoves(state: BoardState): Move[] {
-    // Implement legal move generation
-    // Utilize the cchess instance to retrieve all legal moves
-    return cchess.getLegalMoves(state);
   }
 
   private orderMoves(state: BoardState, moves: Move[]): Move[] {

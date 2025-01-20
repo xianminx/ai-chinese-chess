@@ -4,6 +4,7 @@ import { isValidUCIMove, UCIMove } from "@/lib/ucci";
 import cchess from "@/lib/engine/cchess";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { DIFFICULTY_PROMPTS, getUserPrompt, SYSTEM_PROMPT } from "./prompts";
+// import { MODEL_OPTIONS } from "@/components/providers/SettingsProvider";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
 const MODEL = "gpt-4o"; // gpt-4o-mini
@@ -17,14 +18,15 @@ export class ChessAI {
     this.difficulty = "advanced";
   }
 
-  async getMove(board: BoardState): Promise<{
+  async getMove(board: BoardState, m?: string): Promise<{
     success: boolean;
     move?: UCIMove;
     error?: string;
     debugInfo?: object;
   }> {
     const fen = cchess.toFen(board);
-    const model = MODEL;
+    
+    const model = m ? m : MODEL;
     const isO1 = model.toLowerCase().includes("o1");
     // o1 series models are not using system prompt, and do not support temperature and max_tokens
     const messages: ChatCompletionMessageParam[] = isO1
@@ -40,7 +42,7 @@ export class ChessAI {
         ];
 
     const request = {
-      model: MODEL,
+      model,
       messages,
       ...(isO1 ? {} : { temperature: 0.4, max_tokens: 1000 }),
     };

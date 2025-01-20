@@ -4,11 +4,10 @@ import {
     PlayerColor,
     type BoardState,
     type Piece,
-    type Position,
 } from "./types";
-import { getPieceColor } from "./utils";
-import { isValidMove as validateMove } from "./moveUtils";
+import { isKingInCheck, isValidMove as validateMove } from "./moveUtils";
 import { char2piece, piece2char } from "./utils";
+import { generateLegalMoves } from './moveGeneration';
 
 export function initGame(): BoardState {
     return {
@@ -73,11 +72,6 @@ function initializeBoard(): (Piece | null)[][] {
 }
 
 export function makeMove(state: BoardState, move: Move): BoardState {
-    const result = isValidMove(state, move);
-    if (!result.isValid) {
-        throw new Error(result.reason || "Invalid move");
-    }
-
     // Get the piece at the starting position
     const piece = state.board[move.from.y][move.from.x];
     if (!piece) return state;
@@ -204,42 +198,6 @@ export function isValidMove(
     return result;
 }
 
-export function isKingInCheck(
-    state: BoardState,
-    kingColor: PlayerColor
-): boolean {
-    // Find the king's position
-    const kingPiece = kingColor === "red" ? "K" : "k";
-    let kingPos: Position | null = null;
-
-    for (let y = 0; y < state.board.length; y++) {
-        for (let x = 0; x < state.board[y].length; x++) {
-            if (state.board[y][x] === kingPiece) {
-                kingPos = { x, y };
-                break;
-            }
-        }
-        if (kingPos) break;
-    }
-
-    if (!kingPos) return false;
-
-    // Check if any opponent piece can capture the king
-    for (let y = 0; y < state.board.length; y++) {
-        for (let x = 0; x < state.board[y].length; x++) {
-            const piece = state.board[y][x];
-            if (piece && getPieceColor(piece) !== kingColor) {
-                const result = validateMove(state, { x, y }, kingPos);
-                if (result.isValid) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
 export function doesMoveCauseCheck(state: BoardState, move: Move): boolean {
     // Create a copy of the board to simulate the move
     const boardCopy = state.board.map((row) => [...row]);
@@ -262,14 +220,9 @@ export function doesMoveCauseCheck(state: BoardState, move: Move): boolean {
 }
 
 export function getLegalMoves(state: BoardState): Move[] {
-    return generateLegalMoves(state);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function generateLegalMoves(state: BoardState): Move[] {
-    const legalMoves: Move[] = [];
-    // Your move generation logic here
-    return legalMoves;
+    const moves = generateLegalMoves(state);
+    console.log('cchess.getLegalMoves', state, moves);
+    return moves;
 }
 
 const chess = {
