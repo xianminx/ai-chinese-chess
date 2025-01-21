@@ -128,6 +128,7 @@ export default function Settings() {
                           className="w-full"
                           size="sm"
                           variant="flat"
+                          aria-label={t("settings.aiSettings.aiEngine")}
                         >
                           <SelectItem
                             key="LLM"
@@ -176,6 +177,7 @@ export default function Settings() {
                             className="w-full"
                             size="sm"
                             variant="flat"
+                            aria-label={t("settings.aiSettings.aiDifficulty")}
                           >
                             <SelectItem key="2" value="2">
                               {t("settings.aiSettings.difficultyLevels.easy")}
@@ -207,6 +209,7 @@ export default function Settings() {
                             className="w-full"
                             size="sm"
                             variant="flat"
+                            aria-label={t("settings.aiSettings.aiModel")}
                           >
                             {MODEL_OPTIONS.map((model) => (
                               <SelectItem key={model} value={model}>
@@ -240,6 +243,7 @@ export default function Settings() {
                       startContent={
                         <IoLanguageOutline className="text-default-500" />
                       }
+                      aria-label={t("settings.displaySettings.language")}
                     >
                       {Object.keys(translations).map((lang) => (
                         <SelectItem key={lang} value={lang}>
@@ -266,6 +270,7 @@ export default function Settings() {
                       className="w-full"
                       size="sm"
                       variant="flat"
+                      aria-label={t("settings.displaySettings.theme")}
                       startContent={
                         theme === "dark" ? (
                           <IoMoonOutline className="text-default-500" />
