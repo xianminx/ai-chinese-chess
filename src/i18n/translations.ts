@@ -9,7 +9,9 @@ export const translations = {
         aiEngine: "AI Engine",
         aiEngineOptions: {
           LLM: "LLM Agent",
-          MINIMAX: "Minimax with Alpha-Beta Pruning"
+          MINIMAX: "Minimax with Alpha-Beta Pruning",
+          LLM_INFO: "Advanced AI that can explain its moves and adapt to different play styles",
+          MINIMAX_INFO: "Traditional chess engine that calculates the best moves several steps ahead"
         },
         aiDifficulty: "AI Difficulty",
         difficultyLevels: {
@@ -58,7 +60,21 @@ export const translations = {
       aiSettings: {
         title: "Ajustes de la IA",
         playWithAI: "Jugar con IA",
-        aiModel: "Modelo de IA"
+        aiModel: "Modelo de IA",
+        aiEngine: "Motor de IA",
+        aiEngineOptions: {
+          LLM: "Agente LLM",
+          MINIMAX: "Minimax con Poda Alfa-Beta",
+          LLM_INFO: "IA avanzada que puede explicar sus movimientos y adaptarse a diferentes estilos de juego",
+          MINIMAX_INFO: "Motor de ajedrez tradicional que calcula los mejores movimientos varios pasos adelante"
+        },
+        aiDifficulty: "Dificultad de IA",
+        difficultyLevels: {
+          easy: "Fácil",
+          medium: "Medio",
+          hard: "Difícil"
+        },
+        infoHint: "El Agente LLM utiliza IA para analizar el juego. Minimax usa algoritmos tradicionales de juego."
       },
       displaySettings: {
         title: "Ajustes de Pantalla",
@@ -100,7 +116,21 @@ export const translations = {
       aiSettings: {
         title: "AI 设置",
         playWithAI: "与 AI 对战",
-        aiModel: "AI 模型"
+        aiModel: "AI 模型",
+        aiEngine: "AI 引擎",
+        aiEngineOptions: {
+          LLM: "LLM 代理",
+          MINIMAX: "极小化极大算法与 Alpha-Beta 剪枝",
+          LLM_INFO: "高级AI，能够解释移动原因并适应不同的对弈风格",
+          MINIMAX_INFO: "传统象棋引擎，能提前计算几步最佳着法"
+        },
+        aiDifficulty: "AI 难度",
+        difficultyLevels: {
+          easy: "简单",
+          medium: "中等",
+          hard: "困难"
+        },
+        infoHint: "LLM 代理使用人工智能分析游戏。极小化极大算法使用传统游戏算法。"
       },
       displaySettings: {
         title: "显示设置",
@@ -135,7 +165,7 @@ export const translations = {
         confirm: "确认"
       }
     }
-  }
+  },
   // Add more languages as needed
 };
 

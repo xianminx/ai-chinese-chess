@@ -11,6 +11,7 @@ export const useGameState = () => {
     useEffect(() => {
         if (isBrowser()) {
             const savedState = loadChessState();
+            console.log("savedState", savedState);
             if (savedState) {
                 setState(savedState);
             }

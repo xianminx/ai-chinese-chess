@@ -13,6 +13,7 @@ import {
   Divider,
   Button,
   ScrollShadow,
+  Tooltip,
 } from "@nextui-org/react";
 import {
   IoSettingsOutline,
@@ -128,22 +129,44 @@ export default function Settings() {
                           size="sm"
                           variant="flat"
                         >
-                          <SelectItem key="LLM" value="LLM">
-                            LLM Agent
+                          <SelectItem
+                            key="LLM"
+                            value="LLM"
+                            textValue="LLM Agent"
+                          >
+                            <Tooltip
+                              content={t(
+                                "settings.aiSettings.aiEngineOptions.LLM_INFO"
+                              )}
+                            >
+                              LLM Agent
+                            </Tooltip>
                           </SelectItem>
-                          <SelectItem key="MINIMAX" value="MINIMAX">
-                            Minimax
+                          <SelectItem
+                            key="MINIMAX"
+                            value="MINIMAX"
+                            textValue="Minimax"
+                          >
+                            <Tooltip
+                              content={t(
+                                "settings.aiSettings.aiEngineOptions.MINIMAX_INFO"
+                              )}
+                            >
+                              Minimax
+                            </Tooltip>
                           </SelectItem>
                         </Select>
                       </div>
 
-                      {settings.aiEngine === 'MINIMAX' && (
+                      {settings.aiEngine === "MINIMAX" && (
                         <div className="space-y-2 px-1">
                           <label className="text-sm font-medium block text-default-700">
                             {t("settings.aiSettings.aiDifficulty")}
                           </label>
                           <Select
-                            selectedKeys={[settings.minimaxDepth?.toString() || "3"]}
+                            selectedKeys={[
+                              settings.minimaxDepth?.toString() || "3",
+                            ]}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
@@ -214,13 +237,12 @@ export default function Settings() {
                       className="w-full"
                       size="sm"
                       variant="flat"
-                      startContent={<IoLanguageOutline className="text-default-500" />}
+                      startContent={
+                        <IoLanguageOutline className="text-default-500" />
+                      }
                     >
                       {Object.keys(translations).map((lang) => (
-                        <SelectItem 
-                          key={lang} 
-                          value={lang}
-                        >
+                        <SelectItem key={lang} value={lang}>
                           {t(`settings.displaySettings.languages.${lang}`)}
                         </SelectItem>
                       ))}
@@ -233,28 +255,46 @@ export default function Settings() {
                       {t("settings.displaySettings.theme")}
                     </label>
                     <Select
-                      selectedKeys={[theme ?? 'system']}
-                      onChange={(e) => setTheme(e.target.value)}
+                      selectedKeys={[theme ?? "system"]}
+                      onChange={(e) => {
+                        setTheme(e.target.value);
+                        setSettings({
+                          ...settings,
+                          theme: e.target.value as "light" | "dark" | "system",
+                        });
+                      }}
                       className="w-full"
                       size="sm"
                       variant="flat"
                       startContent={
-                        theme === 'dark' ? (
+                        theme === "dark" ? (
                           <IoMoonOutline className="text-default-500" />
-                        ) : theme === 'light' ? (
+                        ) : theme === "light" ? (
                           <IoSunnyOutline className="text-default-500" />
                         ) : (
                           <IoDesktopOutline className="text-default-500" />
                         )
                       }
                     >
-                      <SelectItem key="light" value="light" startContent={<IoSunnyOutline />}>
+                      <SelectItem
+                        key="light"
+                        value="light"
+                        startContent={<IoSunnyOutline />}
+                      >
                         {t("settings.displaySettings.themeOptions.light")}
                       </SelectItem>
-                      <SelectItem key="dark" value="dark" startContent={<IoMoonOutline />}>
+                      <SelectItem
+                        key="dark"
+                        value="dark"
+                        startContent={<IoMoonOutline />}
+                      >
                         {t("settings.displaySettings.themeOptions.dark")}
                       </SelectItem>
-                      <SelectItem key="system" value="system" startContent={<IoDesktopOutline />}>
+                      <SelectItem
+                        key="system"
+                        value="system"
+                        startContent={<IoDesktopOutline />}
+                      >
                         {t("settings.displaySettings.themeOptions.system")}
                       </SelectItem>
                     </Select>

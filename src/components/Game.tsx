@@ -10,16 +10,18 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 import cchess from "@/lib/engine/cchess";
 import { getAIEngine } from "@/lib/ai";
 import { useSettings } from "./providers/SettingsProvider";
+
 export default function Game() {
     const { state, onMove, onReset } = useGameState();
     const [showConfirm, setShowConfirm] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
     const playStartSound = useAudio("/audio/start.mp3");
     const playMoveSound = useAudio("/audio/click.wav");
-    const { t, mounted: languageMounted } = useLanguage();
     const { settings } = useSettings();
+    const { t } = useLanguage();
 
     const [aiEngine] = useState(() => getAIEngine());
+
 
     const handleReset = () => {
         setShowConfirm(true);
@@ -115,10 +117,6 @@ export default function Game() {
             setIsThinking(false);
         }
     };
-
-    if (!languageMounted) {
-        return null;
-    }
 
     return (
         <div 

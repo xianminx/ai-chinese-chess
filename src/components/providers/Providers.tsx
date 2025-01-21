@@ -9,9 +9,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider attribute="class" defaultTheme="dark">
       <NextUIProvider>
-        <LanguageProvider>
-          <SettingsProvider>{children}</SettingsProvider>
-        </LanguageProvider>
+        <SettingsProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </SettingsProvider>
       </NextUIProvider>
     </NextThemesProvider>
   );

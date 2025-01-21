@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Language } from '@/i18n/translations';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 export const MODEL_OPTIONS = [
     "gpt-3.5-turbo",
@@ -16,14 +17,18 @@ export type SettingsType = {
     useIcons: boolean;
     aiEngine: "LLM" | "MINIMAX";
     minimaxDepth: number;
+    theme?: "light" | "dark" | "system";
+    language?: Language;
 };
 
 const defaultSettings: SettingsType = {
     aiMode: false,
     model: 'gpt-4o-mini',
-    useIcons: true,
-    aiEngine: "LLM",
+    useIcons: false,
+    aiEngine: "MINIMAX",
     minimaxDepth: 3,
+    theme: "system",
+    language: undefined
 };
 
 const SettingsContext = createContext<{
@@ -35,23 +40,27 @@ const SettingsContext = createContext<{
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-    const [settings, setSettings] = useState<SettingsType>(defaultSettings);
-
-    useEffect(() => {
-        // Load settings from localStorage on mount
-        const savedSettings = localStorage.getItem('gameSettings');
-        if (savedSettings) {
-            setSettings(JSON.parse(savedSettings));
+    const [settings, saveSettings] = useState<SettingsType>(() => {
+        if (typeof window !== 'undefined') {
+            const savedSettings = localStorage.getItem('settings');
+            if (savedSettings) {
+                return { ...defaultSettings, ...JSON.parse(savedSettings) };
+            }
         }
-    }, []);
+        return defaultSettings;
+    });
 
-    const handleSetSettings = (newSettings: SettingsType) => {
-        setSettings(newSettings);
-        localStorage.setItem('gameSettings', JSON.stringify(newSettings));
+    const setSettings = (newSettings: SettingsType) => {        
+        if (!newSettings) {
+            console.error('Attempted to save invalid settings:', newSettings);
+            return;
+        }
+        saveSettings(newSettings);
+        localStorage.setItem('settings', JSON.stringify(newSettings));
     };
 
     return (
-        <SettingsContext.Provider value={{ settings, setSettings: handleSetSettings }}>
+        <SettingsContext.Provider value={{ settings, setSettings }}>
             {children}
         </SettingsContext.Provider>
     );

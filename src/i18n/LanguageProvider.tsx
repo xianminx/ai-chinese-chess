@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { translations, Language } from "./translations";
+import { useSettings } from "@/components/providers/SettingsProvider";
 
 type LanguageContextType = {
   language: Language;
@@ -34,18 +35,28 @@ const getSystemLanguage = (): Language => {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setInternalLanguage] = useState<Language>("en");
+  const { settings, setSettings } = useSettings();
 
   useEffect(() => {
-    setLanguage(getSystemLanguage());
+    // On mount, use settings.language if available, otherwise use system language
+    const initialLang = settings.language || getSystemLanguage();
+    setInternalLanguage(initialLang as Language);
     setMounted(true);
-  }, []);
+  }, [settings.language]);
+
+  const setLanguage = (newLang: Language) => {
+    setInternalLanguage(newLang);
+    setSettings({ ...settings, language: newLang });
+  };
 
   const t = (key: string) => {
-    if (!mounted) return key;
+    const lang = language;
+    
+    if (!mounted) return '';
 
     const keys = key.split(".");
-    let value: unknown = translations[language];
+    let value: unknown = translations[lang];
     
     for (const k of keys) {
       value = (value as Record<string, unknown>)?.[k];
