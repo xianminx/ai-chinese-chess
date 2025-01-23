@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
-import { NextRequest } from "next/server";
+import createMDX from "@next/mdx";
+// import remarkGfm from 'remark-gfm';
+
+const withMDX = createMDX({
+  extension: /\.md?$/,
+  options: {
+    // remarkPlugins: [remarkGfm],
+    // rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }]],
+  },
+});
 
 const nextConfig: NextConfig = {
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+  experimental: {
+    mdxRs: false,
+  },
   rewrites: async () => {
     return [
       {
@@ -15,4 +28,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);

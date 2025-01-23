@@ -1,0 +1,62 @@
+import HelloMDX from './hello-mdx'
+
+# Support MDX
+
+## 1. 安装依赖
+
+```bash
+pnpm add @next/mdx
+```
+
+
+## 2. 配置 next.config.ts
+
+```ts
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+});
+
+export default withMDX(nextConfig);
+```
+
+
+## 3. 创建 mdx-components.tsx
+
+```tsx
+import type { MDXComponents } from 'mdx/types'
+ 
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
+  }
+}
+```
+
+## 4. 创建 mdx 文件
+
+```mdx
+# Hello World
+
+This is a test.
+```
+
+## 5. 创建 mdx 文件
+
+```mdx
+# Hello World
+
+This is a test.
+```
+
+## 6. 创建 mdx 文件 with MDXComponents
+
+```mdx
+# Hello World
+
+This is a test.
+```
+
+<HelloMDX />
+
+
+    
