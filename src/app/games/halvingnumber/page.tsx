@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import WinnerTable from "./components/WinnerTable";
 import GamePannel from "./components/GamePannel";
 import Description from "./components/Description";
+import Image from "next/image";
 
 const MAX_NUMBERS = 3000;
 
@@ -36,13 +37,22 @@ export default function HalvingNumberGrid() {
   }, [cellSize, cols, rows]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="mx-auto p-4 sm:p-8">
+    <div className="w-full min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-[2000px] mx-auto p-4 sm:p-8">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">
-            Halving Number Game
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Image
+              src="/icons/halving-icon.svg"
+              width={48}
+              height={48}
+              alt="Halving Number Game"
+              className="text-blue-600"
+            />
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-800">
+              Halving Number Game
+            </h1>
+          </div>
           <p className="text-gray-600 mb-6">
             A mathematical game of strategy
           </p>

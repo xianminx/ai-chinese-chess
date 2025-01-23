@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-export const DOCS_DIR = 'src/app/docs/mdx'
+export const DOCS_DIR = 'src/app/docs/content'
 
 type Metadata = {
   title: string

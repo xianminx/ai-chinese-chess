@@ -1,5 +1,29 @@
 
 
+ AI engine 
+ 1. Fine-tuning LLM with Xiangqi data
+ 2. Complext Agent
+ 3. Specialized Neural Network engine like Stockfish 
+
+
+
+Great posts on teaching LLM to play chess:
+* [Something weird is happening with LLMs and chess](https://dynomight.net/chess/)
+* [OK, I can partly explain the LLM chess weirdness now](https://dynomight.net/more-chess/)
+
+* [Teaching a language model to play chess](https://medium.com/@tbarton_16336/teaching-a-language-model-to-play-chess-1ea69dde40fd)
+This post fine-tunes a LLM on GPT-2 with chess data and then uses it to play chess. Old post but still relevant.
+the Fine-tuning file format 
+
+```sh
+ <|startoftext|> 1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e6 7. g4 e5 8. Nf5 g6 9. g5 gxf5 10. exf5 d5 11. gxf6 d4 12. Bc4 Qc7 13. Qd3 dxe3 14. O-O-O exf2 15. Bxf7+ Kxf7 16. Qd5+ Kxf6 17. Ne4+ Ke7 18. Nd6 Bh6+ 19. Kb1 Kf6 20. Rhf1 Rf8 21. Rxf2 Nc6 22. Qc4 Kg7 23. Rg1+ Kh8 24. Rfg2 Bxf5 25. Nxf5 b5 26. Qe6 Nd4 27. Nxd4 Be3 28. Rg8+ Rxg8 29. Qf6+ Rg7 30. Ne6 Qf7 31. Qxg7+ Qxg7 32. Rxg7 Re8 33. Rg3 Bf4 34. Nc7 Rc8 35. Rc3 b4 36. Rc4 e4 37. Rxe4 Bxc7 38. h3 Rb8 39. Kc1 Kg8 40. Kd2 Rb5 41. Kd3 Be5 42. Kc4 Bxb2 43. Re6 Rh5 44. Kxb4 Rxh3 45. Rxa6 Ba3+ 46. Kc4 h5 47. Kd4 h4 48. c4 Rg3 49. Rh6 h3 50. Ke4 Kg7 51. Rh5 Bc1 <|endoftext|> 
+ ```
+
+ Basically, it tells the LLM the hisotry of the moves, and then the LLM will generate the next move.
+
+
+
+[NNUE Efficiently updatable neural network](https://en.wikipedia.org/wiki/Efficiently_updatable_neural_network#:~:text=An%20efficiently%20updatable%20neural%20network,king%2Dpiece%2Dsquare%20table.)
 
 ### 象棋引擎
 - [Pikafish](https://github.com/official-pikafish/Pikafish)
@@ -8,6 +32,10 @@
 搜索算法 
 https://github.com/lhttjdr/xiangqi/blob/master/doc/1.%20Introduction.md
 
+
+
+
+### NNUE
 
 
 ## Related Research
@@ -21,8 +49,6 @@ https://github.com/lhttjdr/xiangqi/blob/master/doc/1.%20Introduction.md
 - [Chess.com](https://www.chess.com/)
 - [Lichess](https://lichess.org/)
 - [Chess.com](https://www.chess.com/)
-- [Chess.com](https://www.chess.com/)
-
 
 
 1. Reinforcement Learning and Classical AI for Xiangqi

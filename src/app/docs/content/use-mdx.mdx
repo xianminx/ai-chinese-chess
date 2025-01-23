@@ -1,6 +1,13 @@
+---
+title: Use MDX
+publishedAt: 2025-01-23
+summary: Use MDX in Next.js
+---
+
 import HelloMDX from './hello-mdx'
 
-# Support MDX
+
+
 
 ## 1. 安装依赖
 
@@ -50,13 +57,43 @@ This is a test.
 
 ## 6. 创建 mdx 文件 with MDXComponents
 
+在 mdx 文件中使用 MDXComponents 
+* 创建 React 组件
+```tsx
+// hello-mdx.tsx
+export default function HelloMDX() {
+  return <div>Hello MDX</div>;
+}
+```
+
+* 在 CustomMDX 中引用
+```tsx
+// mdx.tsx
+const components = {
+  h1: createHeading(1),
+  h2: createHeading(2),
+  h3: createHeading(3),
+  h4: createHeading(4),
+  h5: createHeading(5),
+  h6: createHeading(6),
+  Image: RoundedImage,
+  a: CustomLink,
+  code: Code,
+  Table,
+  HelloMDX,
+}
+```
+
+* 在 mdx 文件中使用
 ```mdx
 # Hello World
 
 This is a test.
-```
 
 <HelloMDX />
+```
+
+
 
 
     

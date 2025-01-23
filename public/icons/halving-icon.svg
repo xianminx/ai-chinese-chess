@@ -1,0 +1,32 @@
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M6 8C6 8 8.5 4 12 4C15.5 4 18 8 18 8"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    class="opacity-90"
+  />
+  <path
+    d="M8 16C8 16 9.75 20 12 20C14.25 20 16 16 16 16"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    class="opacity-70"
+  />
+  <line
+    x1="12"
+    y1="8"
+    x2="12"
+    y2="16"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    class="opacity-80"
+  />
+  <circle cx="12" cy="8" r="1" fill="currentColor" />
+  <circle cx="12" cy="16" r="1" fill="currentColor" />
+</svg> 

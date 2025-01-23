@@ -1,5 +1,8 @@
-import fs from "fs";
-import { getMdxDir } from "../utils";
+import { formatDate, getDocs } from "../utils";
+import { notFound } from "next/navigation";
+import { CustomMDX } from "./mdx";
+
+const baseUrl = "https://chess.houkui.dev";
 
 export default async function Page({
   params,
@@ -10,20 +13,94 @@ export default async function Page({
   // const docsDirectory = getMdxDir();
   // const filePath = path.join(docsDirectory, `${slug}.mdx`);
 
-  const { default: Post } = await import('@/app/docs/mdx/' + slug + '.mdx');
+  const doc = getDocs().find((doc) => doc.slug === slug);
 
-  return <Post />;
+  if (!doc) {
+    notFound();
+  }
+
+  return (
+    <section>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: doc.metadata.title,
+            datePublished: doc.metadata.publishedAt,
+            dateModified: doc.metadata.publishedAt,
+            description: doc.metadata.summary,
+            image: doc.metadata.image
+              ? `${baseUrl}${doc.metadata.image}`
+              : `/og?title=${encodeURIComponent(doc.metadata.title)}`,
+            url: `${baseUrl}/docs/${doc.slug}`,
+            author: {
+              "@type": "Person",
+              name: "Houkui",
+            },
+          }),
+        }}
+      />
+      <h1 className="title font-semibold text-2xl tracking-tighter">
+        {doc.metadata.title}
+      </h1>
+      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          {formatDate(doc.metadata.publishedAt)}
+        </p>
+      </div>
+      <article className="prose">
+        <CustomMDX source={doc.content} />
+      </article>
+    </section>
+  );
 }
 
 export function generateStaticParams() {
-  const files = fs
-    .readdirSync(getMdxDir())
-    .filter((file: string) => file.match(/\.(md|mdx)$/))
-    .map((file: string) => ({
-      slug: file.replace(/\.(md|mdx)$/, ""),
-    }));
-  console.log("files", files);
-  return files;
+  return getDocs().map((doc) => ({ slug: doc.slug }));
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const slug = (await params).slug;
+  const doc = getDocs().find((doc) => doc.slug === slug);
+  if (!doc) {
+    return;
+  }
+
+  const {
+    title,
+    publishedAt: publishedTime,
+    summary: description,
+    image,
+  } = doc.metadata;
+  const ogImage = image
+    ? image
+    : `${baseUrl}/og?title=${encodeURIComponent(title)}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      publishedTime,
+      url: `${baseUrl}/docs/${doc.slug}`,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
 }
 
 export const dynamicParams = false;
