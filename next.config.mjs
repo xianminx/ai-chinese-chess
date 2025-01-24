@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
 import configMdx from "@next/mdx";
-// import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
+import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
 
 /** @type {import('next').NextConfig} */
 const withMDX = configMdx({
@@ -15,12 +14,12 @@ const withMDX = configMdx({
             ["rehype-katex", { strict: true, throwOnError: true }],
             ["rehype-mathjax"],
             ["rehype-slug"],
-            ["rehype-pretty-code", { keepBackground: true }],
+            ["rehype-pretty-code", { keepBackground: true , theme: moonlightTheme }],
         ],
     },
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
     pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
     experimental: {
         mdxRs: false,

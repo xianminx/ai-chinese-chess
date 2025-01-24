@@ -11,7 +11,7 @@ dayjs.extend(localizedFormat);
 export const DOCS_DIR = "src/app/docs/content";
 export const FILE_BASED_ROUTING_DIR = "src/app/docs/file-based-routing";
 
-const MdxDir = path.join(process.cwd(), ...DOCS_DIR.split("/"));
+export const MdxDir = path.join(process.cwd(), ...DOCS_DIR.split("/"));
 
 export type Metadata = {
     title: string;
@@ -30,7 +30,6 @@ export type Doc = {
 
 function parseFrontmatter(fileContent: string) {
     const { data, content } = matter(fileContent);
-    console.log({ frontmatter: data });
 
     return {
         metadata: {
@@ -86,7 +85,6 @@ export function getDocs() {
         "page.mdx"
     );
     const { metadata, content } = readMDXFile(fileBasedRoutingDocPath);
-    console.log({ fileBasedRoutingDocPath, metadata, content });
 
     const routingDoc = {
         metadata,
@@ -130,6 +128,5 @@ export function toRelative(date: string | Date) {
   if (!dateObj.isValid()) {
     return '';
   }
-  console.log({ dateObj });
   return dateObj.fromNow();
 }
