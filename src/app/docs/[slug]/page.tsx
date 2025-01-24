@@ -1,15 +1,20 @@
 import { formatDate, getDocs } from "../utils";
 import { notFound } from "next/navigation";
-import { CustomMDX } from "./mdx";
-
-const baseUrl = "https://chess.houkui.dev";
+import { baseUrl } from "@/utils/url";
+import { serialize } from "next-mdx-remote/serialize";
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
+import rehypeKatex from 'rehype-katex';
+import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }) {
-  const slug = (await params).slug;
+  const { slug } = await params;
   // const docsDirectory = getMdxDir();
   // const filePath = path.join(docsDirectory, `${slug}.mdx`);
 
@@ -18,6 +23,8 @@ export default async function Page({
   if (!doc) {
     notFound();
   }
+
+  const { default: Content } = await import(`@/app/docs/content/${slug}.mdx`);
 
   return (
     <section>
@@ -30,7 +37,7 @@ export default async function Page({
             "@type": "BlogPosting",
             headline: doc.metadata.title,
             datePublished: doc.metadata.publishedAt,
-            dateModified: doc.metadata.publishedAt,
+            dateModified: doc.metadata.updatedAt || doc.metadata.publishedAt,
             description: doc.metadata.summary,
             image: doc.metadata.image
               ? `${baseUrl}${doc.metadata.image}`
@@ -51,19 +58,20 @@ export default async function Page({
           {formatDate(doc.metadata.publishedAt)}
         </p>
       </div>
-      <article className="prose">
-        <CustomMDX source={doc.content} />
+      <article>
+        {/* <CustomMDX  {...content} /> */}
+         <Content />
       </article>
     </section>
   );
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return getDocs().map((doc) => ({ slug: doc.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const slug = (await params).slug;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const doc = getDocs().find((doc) => doc.slug === slug);
   if (!doc) {
     return;
@@ -102,5 +110,5 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     },
   };
 }
+export const dynamicParams = true;
 
-export const dynamicParams = false;

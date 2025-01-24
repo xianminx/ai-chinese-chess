@@ -1,13 +1,18 @@
-
-import HelloMDX from '../content/hello-mdx'
+import HelloMDX from "./hello-mdx";
+import {
+  default as ChildMDX,
+  frontmatter as childFrontmatter,
+} from "./child.mdx";
 
 ---
+
 title: Using file based routing
 publishedAt: 2025-01-23
 summary: Using file based routing
+
 ---
 
-# MDX Using file based routing
+## MDX Using file based routing
 
 File based routing is a feature that allows you to create pages by placing files in the `app` directory.
 
@@ -15,4 +20,73 @@ For example, this page is located at `src/app/docs/file-based-routing/page.mdx`.
 
 See more: [Using file based routing](https://nextjs.org/docs/app/building-your-application/configuring/mdx#using-file-based-routing)
 
+### Import React Component
+
+Just like you would do in a normal React component.
+
+```tsx
+import HelloMDX from "../content/hello-mdx";
+
+<HelloMDX />;
+```
+
+<p />
+
 <HelloMDX />
+
+### Import another MDX file
+
+```tsx
+import ChildMDX, { metadata } from "./child.mdx";
+```
+
+* **Child frontmatter**
+  This is the frontmatter metadata of the child page.
+
+  > Note: the remark-mdx-frontmatter plugin, which is used to extract the frontmatter metadata from the MDX file, exports the metadata as `frontmatter``
+  but it may conflict with the `frontmatter` in the current page. So we rename it to `childFrontmatter` to avoid conflict.
+
+  <div className="relative p-6 rounded-xl overflow-hidden bg-slate-100">
+    <ul className="list-inside list-disc space-y-2 pl-4">
+      {Object.keys(childFrontmatter).map((key) => (
+        <li className="text-gray-800 font-medium text-sm" key={key}>
+          <span className="font-bold">{key}:</span> {childFrontmatter[key]}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+* **Child page content**
+  <div className="relative p-6 rounded-xl overflow-hidden bg-slate-200">
+      <ChildMDX />
+  </div>
+
+### katex
+
+```math
+C_L = \frac{L}{q S}
+```
+
+### remark-breaks
+You may test `remark-breaks` to break the line.
+```ts
+// next.config.js
+const withMDX = configMdx({
+  options: {
+    remarkPlugins: [['remark-breaks']],
+  },
+});
+
+```
+When `remark-breaks` is enabled, the line break will be converted to a line break.
+
+It will go to the next line when you press enter.
+This is the second line.
+
+### Table
+
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+| Cell 7   | Cell 8   | Cell 9   |

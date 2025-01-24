@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { highlight } from 'sugar-high'
 import React from 'react'
-import HelloMDX from '../content/hello-mdx'
+import HelloMDX from '../file-based-routing/hello-mdx'
 interface TableData {
   headers: string[]
   rows: string[][]
@@ -42,7 +42,7 @@ function CustomLink(props: CustomLinkProps) {
 
   if (href.startsWith('/')) {
     return (
-      <Link href={href} {...props}>
+      <Link {...props}>
         {props.children}
       </Link>
     )
@@ -60,7 +60,8 @@ interface RoundedImageProps extends Omit<React.ComponentProps<typeof Image>, 'al
 }
 
 function RoundedImage(props: RoundedImageProps) {
-  return <Image alt={props.alt} className="rounded-lg" {...props} />
+  const { alt, ...rest } = props
+  return <Image alt={alt} className="rounded-lg" {...rest} />
 }
 
 interface CodeProps extends React.HTMLAttributes<HTMLElement> {
@@ -106,16 +107,16 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
 }
 
 const components = {
-  h1: createHeading(1),
-  h2: createHeading(2),
-  h3: createHeading(3),
-  h4: createHeading(4),
-  h5: createHeading(5),
-  h6: createHeading(6),
-  Image: RoundedImage,
-  a: CustomLink,
-  code: Code,
-  table: Table,
+  // h1: createHeading(1),
+  // h2: createHeading(2),
+  // h3: createHeading(3),
+  // h4: createHeading(4),
+  // h5: createHeading(5),
+  // h6: createHeading(6),
+  // Image: RoundedImage,
+  // a: CustomLink,
+  // code: Code,
+  // table: Table,
   HelloMDX,
   // Table,
 }
@@ -125,10 +126,10 @@ interface CustomMDXProps {
   source: string
   compiledSource?: string
   frontmatter?: Record<string, unknown>
+  [key: string]: unknown
 }
 
 export function CustomMDX(props: CustomMDXProps) {
-  console.log('props', props)
   return (
     <MDXRemote
       {...props}

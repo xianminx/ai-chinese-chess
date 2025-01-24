@@ -1,6 +1,7 @@
-import { baseUrl } from "@/app/sitemap";
-import { getDocs } from "@/app/docs/utils";
 
+
+import { getDocs } from "@/app/docs/utils";
+import { baseUrl } from "@/utils/url";
 export async function GET() {
   const allDocs = await getDocs();
 

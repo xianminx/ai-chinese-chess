@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
-import createMDX from "@next/mdx";
-// import remarkGfm from 'remark-gfm';
+import configMdx from "@next/mdx";
 
-const withMDX = createMDX({
-  extension: /\.md?$/,
+/** @type {import('next').NextConfig} */
+const withMDX = configMdx({
   options: {
-    // remarkPlugins: [remarkGfm],
-    // rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }]],
+    remarkPlugins: [['remark-gfm'], ['remark-frontmatter'], ['remark-mdx-frontmatter'], ['remark-math']],
+    rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }], ['rehype-mathjax']],
   },
 });
 

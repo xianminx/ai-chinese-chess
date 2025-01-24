@@ -6,6 +6,7 @@ export const DOCS_DIR = 'src/app/docs/content'
 type Metadata = {
   title: string
   publishedAt: string
+  updatedAt?: string
   summary: string
   image?: string
 }
@@ -42,6 +43,7 @@ function parseFrontmatter(fileContent: string) {
     metadata: {
       title: metadata.title || 'Untitled',
       publishedAt: metadata.publishedAt || new Date().toISOString().split('T')[0],
+      updatedAt: metadata.updatedAt || metadata.publishedAt,
       summary: metadata.summary || 'No summary available',
       ...(metadata.image && { image: metadata.image })
     } as Metadata,
