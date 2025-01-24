@@ -1,4 +1,4 @@
-import { formatDate, getDocs } from "../utils";
+import { formatDate, getDocs, toRelative } from "../utils";
 import { notFound } from "next/navigation";
 import { baseUrl } from "@/utils/url";
 
@@ -48,7 +48,9 @@ export default async function Page({
       </h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(doc.metadata.publishedAt)}
+            <span title={formatDate(doc.metadata.publishedAt)}>
+            {toRelative(doc.metadata.publishedAt)}
+            </span>
         </p>
       </div>
       <article>
