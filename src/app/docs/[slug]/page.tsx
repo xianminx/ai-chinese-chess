@@ -1,13 +1,6 @@
 import { formatDate, getDocs } from "../utils";
 import { notFound } from "next/navigation";
 import { baseUrl } from "@/utils/url";
-import { serialize } from "next-mdx-remote/serialize";
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
-import rehypeKatex from 'rehype-katex';
-import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 
 export default async function Page({
   params,
@@ -59,7 +52,6 @@ export default async function Page({
         </p>
       </div>
       <article>
-        {/* <CustomMDX  {...content} /> */}
          <Content />
       </article>
     </section>

@@ -1,0 +1,84 @@
+---
+title: Build a documentation site with Next.js and MDX
+---
+
+## What is MDX?
+
+
+## How does MDX work with Next.js?
+
+
+Next.js -> webpack -> loader -> mdx -> react components
+
+remark plugins and rehype plugins
+
+remark: parse markdown to mdx
+
+rehype: convert mast to hast and then to html
+
+
+
+
+
+MDX  compiled to React components and rendered on the page. 
+
+service side rendering
+rsc 
+
+client side rendering
+
+
+
+## How to use MDX in Next.js
+
+### Static page or app routing like page.tsx 
+This is the simplest way to use MDX in Next.js. 
+
+1. Create a new page in the app directory `app/docs/static-mdx-page/page.mdx`
+2. Add the MDX content to the page. You can write it as plain markdown or even use React components. This is just like how you write a tsx file, but with markdown and component code. 
+3. The page will be rendered on the server side and the MDX content will be compiled to React components, and the page will be served as an HTML file. 
+You can access the page at `http://localhost:3000/docs/static-mdx-page`, just like any other tsx page in Next.js. 
+
+Here the basic setting is to config 'mdx' support in next.config.ts
+```ts
+// next.config.ts
+const nextConfig: NextConfig = {
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+   ...
+}
+```
+
+If you want to support GitHub Flavored Markdown, you can add the following plugins in remarkPlugins and rehypePlugins in next.config.ts
+```ts
+// next.config.ts
+import configMdx from "@next/mdx";
+// import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
+
+/** @type {import('next').NextConfig} */
+const withMDX = configMdx({
+  options: {
+    remarkPlugins: [['remark-gfm'], ['remark-frontmatter'], ['remark-mdx-frontmatter'], ['remark-math']],
+    rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }], ['rehype-mathjax'], 
+    ['rehype-slug'], ['rehype-pretty-code', {  keepBackground: true,}],
+  ],
+  },
+});
+```
+
+More or less, based on your requirement, you can add more plugins in remarkPlugins and rehypePlugins. 
+
+
+
+
+
+### Dynamic page like [slug].tsx
+
+
+
+### Remote MDX like MDXRemote
+
+
+
+## Styling with tailwind and `@tailwind/typography`
+
+

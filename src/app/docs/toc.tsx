@@ -4,13 +4,9 @@
  */
 
 import Link from "next/link";
-import { getDocs } from "./utils";
-import { formatDate } from "./utils";
+import { Doc, toRelative } from "./utils";
 
-export function DocsIndex() {
-  const docs = getDocs().sort((a, b) => 
-    new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
-  );
+export function DocsIndex({ docs }: { docs: Doc[] }) {
 
   return (
     <div className="space-y-8 py-6">
@@ -29,7 +25,7 @@ export function DocsIndex() {
                 {doc.metadata.title}
               </h2>
               <time className="text-sm text-zinc-600 dark:text-zinc-400" dateTime={doc.metadata.publishedAt}>
-                {formatDate(doc.metadata.publishedAt)}
+                {toRelative(doc.metadata.publishedAt)}
               </time>
             </div>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
@@ -57,3 +53,32 @@ export function DocsIndex() {
     </div>
   );
 } 
+
+  // return (
+    //     <div className="max-w-4xl mx-auto py-8 px-4">
+    //         <h1 className="text-3xl font-bold mb-8">Documentation</h1>
+    //         {allDocs.map((doc) => (
+    //             <Link
+    //                 key={`${doc.slug}`}
+    //                 href={doc.routePath}
+    //                 className="block p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+    //             >
+    //                 <h3 className="text-xl font-medium mb-2">
+    //                     {doc.metadata.title}
+    //                 </h3>
+    //                 <p className="text-gray-600 mb-4">{doc.metadata.summary}</p>
+    //                 <div className="text-sm text-gray-500">
+    //                     Published: {formatDate(doc.metadata.publishedAt, true)}
+    //                     {doc.metadata.updatedAt &&
+    //                         doc.metadata.updatedAt !==
+    //                             doc.metadata.publishedAt && (
+    //                             <span className="ml-4">
+    //                                 Updated:{" "}
+    //                                 {formatDate(doc.metadata.updatedAt, true)}
+    //                             </span>
+    //                         )}
+    //                 </div>
+    //             </Link>
+    //         ))}
+    //     </div>
+    // );

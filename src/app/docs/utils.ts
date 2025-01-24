@@ -1,120 +1,135 @@
-import fs from 'fs'
-import path from 'path'
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 
-export const DOCS_DIR = 'src/app/docs/content'
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
 
-type Metadata = {
-  title: string
-  publishedAt: string
-  updatedAt?: string
-  summary: string
-  image?: string
-}
+export const DOCS_DIR = "src/app/docs/content";
+export const FILE_BASED_ROUTING_DIR = "src/app/docs/file-based-routing";
+
+const MdxDir = path.join(process.cwd(), ...DOCS_DIR.split("/"));
+
+export type Metadata = {
+    title: string;
+    publishedAt: string;
+    updatedAt?: string;
+    summary: string;
+    author?: string;
+    image?: string;
+};
+export type Doc = {
+    metadata: Metadata;
+    slug: string;
+    content: string;
+    routePath: string;
+};
 
 function parseFrontmatter(fileContent: string) {
-  const frontmatterRegex = /---\s*([\s\S]*?)\s*---/
-  const match = frontmatterRegex.exec(fileContent)
-  
-  if (!match) {
+    const { data, content } = matter(fileContent);
+    console.log({ frontmatter: data });
+
     return {
-      metadata: {
-        title: 'Untitled',
-        publishedAt: new Date().toISOString().split('T')[0],
-        summary: 'No summary available',
-      } as Metadata,
-      content: fileContent.trim()
-    }
-  }
-
-  const frontMatterBlock = match[1]
-  const content = fileContent.replace(frontmatterRegex, '').trim()
-  const frontMatterLines = frontMatterBlock.trim().split('\n')
-  const metadata: Partial<Metadata> = {}
-
-  frontMatterLines.forEach((line) => {
-    const [key, ...valueArr] = line.split(': ')
-    let value = valueArr.join(': ').trim()
-    value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value
-  })
-
-  // Ensure all required fields exist
-  return {
-    metadata: {
-      title: metadata.title || 'Untitled',
-      publishedAt: metadata.publishedAt || new Date().toISOString().split('T')[0],
-      updatedAt: metadata.updatedAt || metadata.publishedAt,
-      summary: metadata.summary || 'No summary available',
-      ...(metadata.image && { image: metadata.image })
-    } as Metadata,
-    content
-  }
+        metadata: {
+            title: data.title || "Untitled",
+            publishedAt:
+                data.publishedAt || new Date().toISOString().split("T")[0],
+            updatedAt:
+                data.updatedAt ||
+                data.publishedAt ||
+                new Date().toISOString().split("T")[0],
+            summary: data.summary || "No summary available",
+            ...(data.author && { author: data.author }),
+            ...(data.image && { image: data.image }),
+        } as Metadata,
+        content: content.trim(),
+    };
 }
 
 function getMDXFiles(dir: string) {
-  return fs.readdirSync(dir).filter((file) => path.extname(file) === '.mdx')
+    try {
+        return fs
+            .readdirSync(dir)
+            .filter((file) => path.extname(file) === ".mdx");
+    } catch (error) {
+        console.warn(`Warning: Could not read directory ${dir}:`, error);
+        return [];
+    }
 }
 
 function readMDXFile(filePath: string) {
-  const rawContent = fs.readFileSync(filePath, 'utf-8')
-  return parseFrontmatter(rawContent)
+    const rawContent = fs.readFileSync(filePath, "utf-8");
+    return parseFrontmatter(rawContent);
 }
 
 function getMDXData(dir: string) {
-  const mdxFiles = getMDXFiles(dir)
-  return mdxFiles.map((file) => {
-    const { metadata, content } = readMDXFile(path.join(dir, file))
-    const slug = path.basename(file, path.extname(file))
+    const mdxFiles = getMDXFiles(dir);
+    return mdxFiles.map((file) => {
+        const { metadata, content } = readMDXFile(path.join(dir, file));
+        const slug = path.basename(file, path.extname(file));
 
-    return {
-      metadata,
-      slug,
-      content,
-    }
-  })
+        return {
+            metadata,
+            slug,
+            content,
+        };
+    });
 }
 
 export function getDocs() {
-  return getMDXData(getMdxDir())
+    const fileBasedRoutingDocPath = path.join(
+        process.cwd(),
+        FILE_BASED_ROUTING_DIR,
+        "page.mdx"
+    );
+    const { metadata, content } = readMDXFile(fileBasedRoutingDocPath);
+    console.log({ fileBasedRoutingDocPath, metadata, content });
+
+    const routingDoc = {
+        metadata,
+        slug: "file-based-routing",
+        content,
+        routePath: `/docs/file-based-routing`,
+    };
+
+    const contentDocs = getMDXData(MdxDir)
+        .map((doc) => ({
+            ...doc,
+            routePath: `/docs/${doc.slug}`,
+        }))
+        .sort((a, b) => {
+            const dateA = a?.metadata?.publishedAt
+                ? new Date(a.metadata.publishedAt)
+                : new Date(0);
+            const dateB = b?.metadata?.publishedAt
+                ? new Date(b.metadata.publishedAt)
+                : new Date(0);
+            return dateB.getTime() - dateA.getTime();
+        });
+
+    return [routingDoc, ...contentDocs];
 }
 
-export function formatDate(date: string, includeRelative = false) {
-  const currentDate = new Date()
-  if (!date.includes('T')) {
-    date = `${date}T00:00:00`
-  }
-  const targetDate = new Date(date)
+export function formatDate(date: string | Date) {
+    const dateObj = dayjs(date);
 
-  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear()
-  const monthsAgo = currentDate.getMonth() - targetDate.getMonth()
-  const daysAgo = currentDate.getDate() - targetDate.getDate()
+    if (!dateObj.isValid()) {
+        return "Invalid date";
+    }
 
-  let formattedDate = ''
-
-  if (yearsAgo > 0) {
-    formattedDate = `${yearsAgo}y ago`
-  } else if (monthsAgo > 0) {
-    formattedDate = `${monthsAgo}mo ago`
-  } else if (daysAgo > 0) {
-    formattedDate = `${daysAgo}d ago`
-  } else {
-    formattedDate = 'Today'
-  }
-
-  const fullDate = targetDate.toLocaleString('en-us', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
-  if (!includeRelative) {
-    return fullDate
-  }
-
-  return `${fullDate} (${formattedDate})`
+    const fullDate = dateObj.format("MMMM D, YYYY");
+    return fullDate;
 }
 
+export function toRelative(date: string | Date) {
+  const dateObj = dayjs(date);
 
-export function getMdxDir() {
-  return path.join(process.cwd(), ...DOCS_DIR.split('/'))
+  if (!dateObj.isValid()) {
+    return '';
+  }
+  console.log({ dateObj });
+  return dateObj.fromNow();
 }
