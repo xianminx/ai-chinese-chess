@@ -2,6 +2,7 @@ import { formatDate, getDocs, toRelative, MdxDir } from "../utils";
 import { notFound } from "next/navigation";
 import { baseUrl } from "@/utils/url";
 import fs from "fs";
+import path from "path";
 
 export default async function Page({
     params,
