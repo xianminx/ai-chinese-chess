@@ -8,7 +8,8 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
-export const DOCS_DIR = "src/app/docs/content";
+export const DOCS_DIR = "src/app/docs";
+export const CONTENT_DIR = "src/app/docs/content";
 export const FILE_BASED_ROUTING_DIR = "src/app/docs/file-based-routing";
 
 export const MdxDir = path.join(process.cwd(), ...DOCS_DIR.split("/"));
@@ -21,11 +22,16 @@ export type Metadata = {
     author?: string;
     image?: string;
 };
+
+export type DocType = 'page' | 'content';
+
 export type Doc = {
     metadata: Metadata;
     slug: string;
     content: string;
     routePath: string;
+    type: DocType;
+    filePath: string;
 };
 
 function parseFrontmatter(fileContent: string) {
@@ -40,7 +46,7 @@ function parseFrontmatter(fileContent: string) {
                 data.updatedAt ||
                 data.publishedAt ||
                 new Date().toISOString().split("T")[0],
-            summary: data.summary || "No summary available",
+            summary: data.summary,
             ...(data.author && { author: data.author }),
             ...(data.image && { image: data.image }),
         } as Metadata,
@@ -64,69 +70,131 @@ function readMDXFile(filePath: string) {
     return parseFrontmatter(rawContent);
 }
 
-function getMDXData(dir: string) {
-    const mdxFiles = getMDXFiles(dir);
-    return mdxFiles.map((file) => {
-        const { metadata, content } = readMDXFile(path.join(dir, file));
-        const slug = path.basename(file, path.extname(file));
+function getStaticPages(baseDir: string): Doc[] {
+    const results: Doc[] = [];
+    
+    function scanDirectory(dir: string) {
+        const items = fs.readdirSync(dir);
+        
+        for (const item of items) {
+            const fullPath = path.join(dir, item);
+            const stat = fs.statSync(fullPath);
+            
+            if (stat.isDirectory()) {
+                // Skip the content directory as it's for dynamic routes
+                if (item === 'content') continue;
+                
+                // Check for page.mdx in this directory
+                const pageMdxPath = path.join(fullPath, 'page.mdx');
+                const pageMdPath = path.join(fullPath, 'page.md'); // Check for .md as well
+                if (fs.existsSync(pageMdxPath) || fs.existsSync(pageMdPath)) {
+                    const existingPath = fs.existsSync(pageMdxPath) ? pageMdxPath : pageMdPath;
+                    const { metadata, content } = readMDXFile(existingPath);
+                    // Calculate relative path from docs directory
+                    const relativePath = path.relative(baseDir, fullPath);
+                    const routePath = relativePath ? `/docs/${relativePath}` : '/docs';
+                    
+                    results.push({
+                        metadata,
+                        slug: relativePath || 'index',
+                        content,
+                        routePath,
+                        type: 'page' as DocType,
+                        filePath: existingPath, // Added filePath
+                    });
+                }
+                
+                // Recursively scan subdirectories
+                scanDirectory(fullPath);
+            }
+        }
+    }
+    
+    scanDirectory(baseDir);
+    return results;
+}
 
+function getContentPages(): Doc[] {
+    const contentDir = path.join(process.cwd(), CONTENT_DIR);
+    const files = fs.readdirSync(contentDir)
+        .filter(file => /\.(mdx?|md)$/.test(file));
+    
+    return files.map(file => {
+        const filePath = path.join(contentDir, file); // Get the full path
+        const { metadata, content } = readMDXFile(filePath);
+        const slug = path.basename(file, path.extname(file));
+        
         return {
             metadata,
             slug,
             content,
+            routePath: `/docs/${slug}`,
+            type: 'content' as DocType,
+            filePath, // Added filePath
         };
+    }).sort((a, b) => {
+        const dateA = new Date(a.metadata.publishedAt);
+        const dateB = new Date(b.metadata.publishedAt);
+        return dateB.getTime() - dateA.getTime();
     });
 }
 
 export function getDocs() {
-    const fileBasedRoutingDocPath = path.join(
-        process.cwd(),
-        FILE_BASED_ROUTING_DIR,
-        "page.mdx"
-    );
-    const { metadata, content } = readMDXFile(fileBasedRoutingDocPath);
+    const docsDir = path.join(process.cwd(), DOCS_DIR);
+    
+    // Get all static pages (file-based routing)
+    const staticPages = getStaticPages(docsDir);
+    
+    // Get all dynamic content pages
+    const contentPages = getContentPages();
 
-    const routingDoc = {
-        metadata,
-        slug: "file-based-routing",
-        content,
-        routePath: `/docs/file-based-routing`,
-    };
+    const allDocs = [...staticPages, ...contentPages];
 
-    const contentDocs = getMDXData(MdxDir)
-        .map((doc) => ({
-            ...doc,
-            routePath: `/docs/${doc.slug}`,
-        }))
-        .sort((a, b) => {
-            const dateA = a?.metadata?.publishedAt
-                ? new Date(a.metadata.publishedAt)
-                : new Date(0);
-            const dateB = b?.metadata?.publishedAt
-                ? new Date(b.metadata.publishedAt)
-                : new Date(0);
-            return dateB.getTime() - dateA.getTime();
-        });
-
-    return [routingDoc, ...contentDocs];
+    return allDocs.sort((a, b) => {
+        const dateA = new Date(a.metadata.publishedAt);
+        const dateB = new Date(b.metadata.publishedAt);
+        return dateB.getTime() - dateA.getTime();
+    });
 }
 
-export function formatDate(date: string | Date) {
+/**
+ * Formats a date string or Date object into a human-readable format.
+ * Returns both display text and full datetime for tooltip.
+ * 
+ * @param date - The date to format (string or Date object)
+ * @param options - Optional configuration object
+ * @param options.threshold - Number of days to use relative time format (default: 7)
+ * @returns Object containing display text and full datetime
+ */
+export function formatDate(date: string | Date, options?: { threshold?: number }) {
     const dateObj = dayjs(date);
 
     if (!dateObj.isValid()) {
-        return "Invalid date";
+        return {
+            display: "Invalid date",
+            full: "Invalid date"
+        };
     }
 
-    const fullDate = dateObj.format("MMMM D, YYYY");
-    return fullDate;
-}
+    // Default threshold is 7 days
+    const threshold = options?.threshold ?? 7;
+    const now = dayjs();
+    const diffInDays = now.diff(dateObj, 'day');
 
-export function toRelative(date: string | Date) {
-  const dateObj = dayjs(date);
+    // Full datetime for tooltip
+    const fullDateTime = dateObj.format("MMMM D, YYYY, h:mm A");
 
-  if (!dateObj.isValid()) {
-    return '';
-  }
-  return dateObj.fromNow();
+    // If the date is within the threshold, show relative time
+    if (diffInDays < threshold) {
+        return {
+            display: dateObj.fromNow(),
+            full: fullDateTime
+        };
+    }
+
+    // Otherwise show the full date
+    return {
+        display: dateObj.format("MM/DD/YYYY"),
+        full: fullDateTime
+    };
 }

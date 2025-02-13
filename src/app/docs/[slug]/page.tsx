@@ -1,4 +1,4 @@
-import { formatDate, getDocs, toRelative, MdxDir } from "../utils";
+import { formatDate, getDocs, MdxDir } from "../utils";
 import { notFound } from "next/navigation";
 import { baseUrl } from "@/utils/url";
 import fs from "fs";
@@ -17,7 +17,8 @@ export default async function Page({
         notFound();
     }
 
-    const { default: Content } = await import(`@/app/docs/content/${slug}.mdx`);
+    // Import the content using the filePath
+    const Content = (await import(`../../../${path.relative(process.cwd(), doc.filePath)}`)).default;
 
     return (
         <section>
@@ -51,8 +52,8 @@ export default async function Page({
             </h1>
             <div className="flex justify-between items-center mt-2 mb-8 text-sm">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    <span title={formatDate(doc.metadata.publishedAt)}>
-                        {toRelative(doc.metadata.publishedAt)}
+                    <span title={formatDate(doc.metadata.publishedAt).full}>
+                        {formatDate(doc.metadata.publishedAt).display}
                     </span>
                 </p>
             </div>
@@ -66,12 +67,13 @@ export default async function Page({
 export async function generateStaticParams() {
     const mdxFiles = fs
         .readdirSync(MdxDir)
-        .filter((file) => path.extname(file) === ".mdx");
+        .filter((file) => path.extname(file) === ".mdx" || path.extname(file) === ".md");
     return mdxFiles.map((file) => {
         const slug = path.basename(file, path.extname(file));
 
         return {
             slug,
+            fileName: file,
         };
     });
 }
