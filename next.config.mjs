@@ -3,6 +3,7 @@ import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
 
 /** @type {import('next').NextConfig} */
 const withMDX = configMdx({
+    extension: /\.mdx?$/,
     options: {
         remarkPlugins: [
             ["remark-gfm"],

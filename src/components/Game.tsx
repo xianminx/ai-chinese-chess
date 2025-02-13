@@ -3,7 +3,7 @@ import Chessboard from "./Chessboard";
 import { useGameState } from "../hooks/useGameState";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
-import { useAudio } from "@/hooks/useAudio.tsx";
+import { useAudio } from "@/hooks/useAudio";
 import Image from "next/image";
 import ChatComponent from "./chat/ChatComponent";
 import { useLanguage } from "@/i18n/LanguageProvider";

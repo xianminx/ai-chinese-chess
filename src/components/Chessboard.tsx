@@ -11,7 +11,7 @@ import BoardGrid from "../../public/board.svg";
 import Cell from "./Cell";
 import { useEffect, useState } from "react";
 import { isSamePosition } from "../lib/engine/utils";
-import { useAudio } from "@/hooks/useAudio.tsx";
+import { useAudio } from "@/hooks/useAudio";
 import { motion } from "motion/react";
 import toast from "react-hot-toast";
 import { useSettings } from "./providers/SettingsProvider";

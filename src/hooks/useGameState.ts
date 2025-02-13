@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback, useEffect } from "react";
 import cchess from "../lib/engine/cchess";
 import { BoardState, Move } from "../lib/engine/types";

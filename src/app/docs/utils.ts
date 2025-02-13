@@ -54,17 +54,6 @@ function parseFrontmatter(fileContent: string) {
     };
 }
 
-function getMDXFiles(dir: string) {
-    try {
-        return fs
-            .readdirSync(dir)
-            .filter((file) => path.extname(file) === ".mdx");
-    } catch (error) {
-        console.warn(`Warning: Could not read directory ${dir}:`, error);
-        return [];
-    }
-}
-
 function readMDXFile(filePath: string) {
     const rawContent = fs.readFileSync(filePath, "utf-8");
     return parseFrontmatter(rawContent);
