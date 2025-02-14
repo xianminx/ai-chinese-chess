@@ -1,21 +1,26 @@
 import configMdx from "@next/mdx";
 import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
+import remarkGfm from 'remark-gfm'
 
+import fs from 'fs';
+import path from 'path';
 /** @type {import('next').NextConfig} */
 const withMDX = configMdx({
     extension: /\.mdx?$/,
     options: {
         remarkPlugins: [
-            ["remark-gfm"],
+            remarkGfm,
             ["remark-frontmatter"],
             ["remark-mdx-frontmatter"],
             ["remark-math"],
+            remarkDebug
         ],
         rehypePlugins: [
             ["rehype-katex", { strict: true, throwOnError: true }],
-            ["rehype-mathjax"],
+            // ["rehype-mathjax"],
             ["rehype-slug"],
             ["rehype-pretty-code", { keepBackground: true , theme: moonlightTheme }],
+            rehypeDebug
         ],
     },
 });
@@ -39,3 +44,46 @@ const nextConfig = {
 };
 
 export default withMDX(nextConfig);
+
+// Create a debug remark plugin
+function remarkDebug() {
+    return (tree, file) => {
+        
+        console.log('=== Remark Transform Debug ===')
+        console.log('File path:', file.path)
+        
+        // Create inspect directory if it doesn't exist
+        const inspectDir = path.join(process.cwd(), 'inspect');
+        if (!fs.existsSync(inspectDir)){
+            fs.mkdirSync(inspectDir, { recursive: true });
+        }
+        
+        // Write AST to debug file with same name as source
+        const fileName = path.relative(process.cwd(), file.path).replace(/\//g, '-').replace(/\.[^/.]+$/, '') + '-remark.json';
+        const debugPath = path.join(inspectDir, fileName);
+        fs.writeFileSync(
+            debugPath,
+            JSON.stringify(tree, null, 2)
+        );
+        console.log('AST written to:', debugPath);
+    }
+}
+
+function rehypeDebug() {
+    return (tree, file) => {
+        console.log('=== Rehype Transform Debug ===')
+        // Create inspect directory if it doesn't exist
+        const inspectDir = path.join(process.cwd(), 'inspect');
+        if (!fs.existsSync(inspectDir)){
+            fs.mkdirSync(inspectDir, { recursive: true });
+        }
+        
+        // Write AST to debug file with same name as source
+        const fileName = path.relative(process.cwd(), file.path).replace(/\//g, '-').replace(/\.[^/.]+$/, '') + '-rehype.json';
+        const debugPath = path.join(inspectDir, fileName);
+        fs.writeFileSync(
+            debugPath,
+            JSON.stringify(tree, null, 2)
+        );
+    }
+}

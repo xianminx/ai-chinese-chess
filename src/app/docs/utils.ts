@@ -12,7 +12,6 @@ export const DOCS_DIR = "src/app/docs";
 export const CONTENT_DIR = "src/app/docs/content";
 export const FILE_BASED_ROUTING_DIR = "src/app/docs/file-based-routing";
 
-export const MdxDir = path.join(process.cwd(), ...DOCS_DIR.split("/"));
 
 export type Metadata = {
     title: string;
@@ -28,6 +27,7 @@ export type DocType = 'page' | 'content';
 export type Doc = {
     metadata: Metadata;
     slug: string;
+    file: string;
     content: string;
     routePath: string;
     type: DocType;
@@ -89,6 +89,7 @@ function getStaticPages(baseDir: string): Doc[] {
                         content,
                         routePath,
                         type: 'page' as DocType,
+                        file: path.basename(existingPath),
                         filePath: existingPath, // Added filePath
                     });
                 }
@@ -104,7 +105,7 @@ function getStaticPages(baseDir: string): Doc[] {
 }
 
 function getContentPages(): Doc[] {
-    const contentDir = path.join(process.cwd(), CONTENT_DIR);
+    const contentDir = path.join(process.cwd(), DOCS_DIR, 'content');
     const files = fs.readdirSync(contentDir)
         .filter(file => /\.(mdx?|md)$/.test(file));
     
@@ -119,6 +120,7 @@ function getContentPages(): Doc[] {
             content,
             routePath: `/docs/${slug}`,
             type: 'content' as DocType,
+            file: file,
             filePath, // Added filePath
         };
     }).sort((a, b) => {

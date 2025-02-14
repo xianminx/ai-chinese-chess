@@ -1,5 +1,9 @@
 ---
 title: Build a documentation site with Next.js and MDX
+summary: This is a guide to build a documentation site with Next.js and MDX.
+publishedAt: 2025-02-13
+image: /og?title=Build a documentation site with Next.js and MDX
+author: Lucas
 ---
 
 ## What is MDX?
@@ -7,16 +11,21 @@ title: Build a documentation site with Next.js and MDX
 
 ## How does MDX work with Next.js?
 
+Next.js provides a detail documentation about how to use MDX in [MDX with Next.js](https://nextjs.org/docs/app/building-your-application/configuring/mdx).
+
+There are 3 ways to use MDX in Next.js:
+
+1. Static page or app routing like page.tsx 
+2. Dynamic page like [slug].tsx
+3. Remote MDX like MDXRemote
+
 
 Next.js -> webpack -> loader -> mdx -> react components
 
 remark plugins and rehype plugins
 
-remark: parse markdown to mdx
-
-rehype: convert mast to hast and then to html
-
-
+* remark: parse markdown to mdx
+* rehype: convert mast to hast and then to html
 
 
 
@@ -39,7 +48,7 @@ This is the simplest way to use MDX in Next.js.
 3. The page will be rendered on the server side and the MDX content will be compiled to React components, and the page will be served as an HTML file. 
 You can access the page at `http://localhost:3000/docs/static-mdx-page`, just like any other tsx page in Next.js. 
 
-Here the basic setting is to config 'mdx' support in next.config.ts
+Here the basic setting is to config 'mdx' support in s`next.config.ts`
 ```ts
 // next.config.ts
 const nextConfig: NextConfig = {
@@ -48,7 +57,8 @@ const nextConfig: NextConfig = {
 }
 ```
 
-If you want to support GitHub Flavored Markdown, you can add the following plugins in remarkPlugins and rehypePlugins in next.config.ts
+If you want to support GitHub Flavored Markdown, you can add the following plugins in `remarkPlugins` and `rehypePlugins` in `next.config.ts`
+
 ```ts
 // next.config.ts
 import configMdx from "@next/mdx";
@@ -58,7 +68,7 @@ import configMdx from "@next/mdx";
 const withMDX = configMdx({
   options: {
     remarkPlugins: [['remark-gfm'], ['remark-frontmatter'], ['remark-mdx-frontmatter'], ['remark-math']],
-    rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }], ['rehype-mathjax'], 
+    rehypePlugins: [['rehype-katex', { strict: true, throwOnError: true }], 
     ['rehype-slug'], ['rehype-pretty-code', {  keepBackground: true,}],
   ],
   },
@@ -68,7 +78,18 @@ const withMDX = configMdx({
 More or less, based on your requirement, you can add more plugins in remarkPlugins and rehypePlugins. 
 
 
+In your mdx file, you may need to use some components, you can define them in `mdx-components.tsx` and import them in your mdx file.
 
+```tsx
+// mdx-components.tsx
+import { MDXComponents } from 'mdx/types';
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {  
+    ...components,
+  }
+}
+```
 
 
 ### Dynamic page like [slug].tsx
@@ -82,3 +103,56 @@ More or less, based on your requirement, you can add more plugins in remarkPlugi
 ## Styling with tailwind and `@tailwind/typography`
 
 
+## Math
+Mdx use `remark-math` to convert markdown math to katex.  And use `rehype-katex` to convert katex to html. Or optionally you can use `rehype-mathjax` to convert math to mathjax. See [Mdx Math Support](https://mdxjs.com/guides/math/)
+* For Next.js with MDX support, configure the plugins in `next.config.ts`
+* For Katex, `css` needs to be imported in `layout.tsx` or `mdx-components.tsx`, see** `./src/app/docs/layout.tsx` and `./src/mdx-components.tsx`.
+
+### katex
+See [Mdx Math Support](https://mdxjs.com/guides/math/)
+
+* Simple inline math:  $$\sqrt{a^2 + b^2}$$
+* Block math:
+
+```math
+C_L = \frac{L}{q S}
+```
+
+
+### remark-breaks
+You may test `remark-breaks` to break the line.
+```ts
+// next.config.js
+const withMDX = configMdx({
+  options: {
+    remarkPlugins: [['remark-breaks']],
+  },
+});
+
+```
+When `remark-breaks` is enabled, the line break will be converted to a line break.
+
+It will go to the next line when you press enter.
+This is the second line.
+
+### Table
+
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+| Cell 7   | Cell 8   | Cell 9   |
+
+
+## MDX plugins 
+  * remark
+    * remark-mdx-frontmatter
+    * remark-breaks
+    * remark-gfm
+    * remark-math
+    * remark-frontmatter
+
+  * rehype
+    * rehype-katex
+    * rehype-slug
+    * rehype-pretty-code

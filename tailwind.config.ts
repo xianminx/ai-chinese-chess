@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 import { nextui } from "@nextui-org/react";
+import { BlockList } from "net";
 
 const config: Config = {
   content: [
@@ -57,6 +58,14 @@ const config: Config = {
             },
             'code::after': {
               content: '""'
+            },
+            'code': {
+              padding: '0 0.2em',  // Adds space inside the code block
+              margin: '0 0.2em',       // Adds space around the code block
+            },
+            blockquote: {
+              quotes: 'none',
+              'not-italic': true,
             }
           }
         }

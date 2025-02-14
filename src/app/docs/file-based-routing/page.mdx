@@ -1,6 +1,6 @@
 ---
 title: MDX Using file based routing
-publishedAt: 2025-01-23
+publishedAt: 2024-01-01
 author: "Lucas X"
 summary: A demo to show using file based routing for mdx, just like regular app routing page.tsx in Next.js.
 ---
@@ -10,7 +10,6 @@ import {
   default as ChildMDX,
   frontmatter as childFrontmatter,
 } from "./child.mdx";
-
 
 ## MDX Using file based routing
 
@@ -25,7 +24,7 @@ See more: [Using file based routing](https://nextjs.org/docs/app/building-your-a
 Just like you would do in a normal React component.
 
 ```tsx
-import HelloMDX from "../content/hello-mdx";
+import HelloMDX from "./hello-mdx";
 
 <HelloMDX />;
 ```
@@ -36,15 +35,26 @@ import HelloMDX from "../content/hello-mdx";
 
 ### Import another MDX file
 
-```tsx
-import ChildMDX, { metadata } from "./child.mdx";
-```
+We can directly import the MDX file as a React component. Next.js use [remark-mdx-frontmatter](https://github.com/remcohaszing/remark-mdx-frontmatter) as the plugin to extract the frontmatter metadata from the MDX file.
 
-* **Child frontmatter**
+Remember to add dependency to your `package.json` and add the plugin to `remarkPlugins` in `next.config.ts`.
+
+  ```tsx
+  import {
+    default as ChildMDX,
+    frontmatter as childFrontmatter,
+  } from "./child.mdx";
+  ```
+
+#### **childFrontmatter**
+
   This is the frontmatter metadata of the child page.
 
-  > Note: the remark-mdx-frontmatter plugin, which is used to extract the frontmatter metadata from the MDX file, exports the metadata as `frontmatter`
-  but it may conflict with the `frontmatter` in the current page. So we rename it to `childFrontmatter` to avoid conflict.
+  <pre className="relative p-6 rounded-xl overflow-hidden bg-slate-100">
+    {JSON.stringify(childFrontmatter, null, 2)}
+  </pre>
+
+  <p />
 
   <div className="relative p-6 rounded-xl overflow-hidden bg-slate-100">
     <ul className="list-inside list-disc space-y-2 pl-4">
@@ -56,37 +66,38 @@ import ChildMDX, { metadata } from "./child.mdx";
     </ul>
   </div>
 
-* **Child page content**
-  <div className="relative p-6 rounded-xl overflow-hidden bg-slate-200">
-      <ChildMDX />
+#### **Child page content**
+
+  <div className="relative p-6 rounded-xl overflow-hidden bg-slate-100">
+    <ChildMDX />
   </div>
 
-### katex
+> [!NOTE]
+> The `remark-mdx-frontmatter` plugin, which is used to extract the frontmatter metadata from the MDX file, exports the metadata as `frontmatter`
+  but it may conflict with the `frontmatter` in the current page. So we rename it to `childFrontmatter` to avoid conflict.
 
-```math
-C_L = \frac{L}{q S}
-```
 
-### remark-breaks
-You may test `remark-breaks` to break the line.
-```ts
-// next.config.js
-const withMDX = configMdx({
-  options: {
-    remarkPlugins: [['remark-breaks']],
-  },
-});
 
-```
-When `remark-breaks` is enabled, the line break will be converted to a line break.
+### Github Flavored Blockquotes with Alert
 
-It will go to the next line when you press enter.
-This is the second line.
+> This is a default blockquote without any special styling.
 
-### Table
+> [!NOTE]
+> Provides additional information or context about the topic.
+> Use this for general information that you want to highlight.
 
-| Header 1 | Header 2 | Header 3 |
-|----------|----------|----------|
-| Cell 1   | Cell 2   | Cell 3   |
-| Cell 4   | Cell 5   | Cell 6   |
-| Cell 7   | Cell 8   | Cell 9   |
+> [!TIP]
+> Suggests a helpful way to use a feature or to accomplish a task.
+> Perfect for sharing best practices and useful suggestions.
+
+> [!IMPORTANT]
+> Crucial information necessary for users to succeed.
+> Use this for must-know information.
+
+> [!WARNING]
+> Warns users of potentially dangerous effects of an action.
+> Helps prevent user mistakes before they occur.
+
+> [!CAUTION]
+> Explains dangerous consequences of an action.
+> Use this for serious warnings about risky actions.
