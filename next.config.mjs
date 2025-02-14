@@ -1,6 +1,5 @@
 import configMdx from "@next/mdx";
 import moonlightTheme from './assets/moonlight-ii.json' with { type: 'json' };
-import remarkGfm from 'remark-gfm'
 
 import fs from 'fs';
 import path from 'path';
@@ -9,18 +8,17 @@ const withMDX = configMdx({
     extension: /\.mdx?$/,
     options: {
         remarkPlugins: [
-            remarkGfm,
+            ["remark-gfm"],
             ["remark-frontmatter"],
             ["remark-mdx-frontmatter"],
             ["remark-math"],
-            remarkDebug
+            // remarkDebug
         ],
         rehypePlugins: [
             ["rehype-katex", { strict: true, throwOnError: true }],
-            // ["rehype-mathjax"],
             ["rehype-slug"],
             ["rehype-pretty-code", { keepBackground: true , theme: moonlightTheme }],
-            rehypeDebug
+            // rehypeDebug
         ],
     },
 });
@@ -45,10 +43,10 @@ const nextConfig = {
 
 export default withMDX(nextConfig);
 
-// Create a debug remark plugin
+// For future debugging use - currently disabled
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function remarkDebug() {
     return (tree, file) => {
-        
         console.log('=== Remark Transform Debug ===')
         console.log('File path:', file.path)
         
@@ -69,6 +67,7 @@ function remarkDebug() {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function rehypeDebug() {
     return (tree, file) => {
         console.log('=== Rehype Transform Debug ===')
@@ -87,3 +86,4 @@ function rehypeDebug() {
         );
     }
 }
+

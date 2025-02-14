@@ -16,7 +16,8 @@ function extractText(node: React.ReactNode): string {
     return node.map(extractText).join("");
   }
   if (React.isValidElement(node)) {
-    return extractText(node.props.children);
+    const element = node as React.ReactElement<{ children?: React.ReactNode }>;
+    return extractText(element.props.children);
   }
   return "";
 }
@@ -42,9 +43,10 @@ function removeAlertMarker(node: React.ReactNode): React.ReactNode {
     return node.map(removeAlertMarker);
   }
   if (React.isValidElement(node)) {
-    return React.cloneElement(node, {
-      ...node.props,
-      children: removeAlertMarker(node.props.children),
+    const element = node as React.ReactElement<{ children?: React.ReactNode }>;
+    return React.cloneElement(element, {
+      ...element.props,
+      children: removeAlertMarker(element.props.children),
     });
   }
   return node;

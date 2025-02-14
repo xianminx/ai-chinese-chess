@@ -24,7 +24,6 @@ export default async function Page({
   // See https://github.com/vercel/next.js/discussions/12151 for more details
   const mdxModule = await import(`@/app/docs/content/${doc.file}`);
   const Content = mdxModule.default;
-  console.log(`mdxModule: ${mdxModule}`);
 
   return (
     <section>
